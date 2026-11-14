@@ -1,64 +1,38 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
 # Dependencies
-node_modules/
-.pnpm-store/
+node_modules
+.pnp
+.pnp.js
 
-# Build output
-dist/
-build/
-.next/
-next-env.d.ts
-out/
-coverage/
-*.tsbuildinfo
-
-# Environment files and secrets (keep only the placeholder template)
+# Local env files
 .env
-.env.*
-!.env.example
-*.pem
-*.key
-*.p12
-*.pfx
-*.crt
-secrets/
-credentials*.json
-service-account*.json
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Uploaded and runtime data
-uploads/
-storage/
-tmp/
-*.sqlite
-*.sqlite3
-*.db
+# Testing
+coverage
 
-# Database dumps and backups
-*.sql.gz
-*.dump
-*.bak
-backups/
+# Turbo
+.turbo
 
-# Logs
-logs/
-*.log
+# Vercel
+.vercel
+
+# Build Outputs
+.next/
+out/
+build
+dist
+
+
+# Debug
 npm-debug.log*
-pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Test and tool caches
-.vitest/
-.eslintcache
-.cache/
-.turbo/
-playwright-report/
-test-results/
-
-# Editor and OS files
-.vscode/*
-!.vscode/extensions.json
-.idea/
-*.swp
+# Misc
 .DS_Store
-Thumbs.db
-
-# Local Claude Code settings
-.claude/settings.local.json
+*.pem
