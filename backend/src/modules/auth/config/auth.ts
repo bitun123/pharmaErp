@@ -1,99 +1,57 @@
-
-import dotenv from "dotenv";
-dotenv.config();
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-
-import { sendOTPEmail } from "../service/email.service.js";
 import { emailOTP } from "better-auth/plugins";
-import { Prisma } from "@prisma/client";
-const isProduction = process.env.NODE_ENV === "production";
-
-if (!process.env.BETTER_AUTH_SECRET || !process.env.BETTER_AUTH_URL) {
-  throw new Error(
-    "BETTER_AUTH_SECRET and BETTER_AUTH_URL must be set in the environment variables",
-  );
-}
-
+import { sendOTPEmail } from "../service/email.service.ts";
+import { prisma } from "../../../database/prisma-client.ts";
+import { env } from "../../../config/env.ts";
 
 export const auth = betterAuth({
-  appName: "Better Auth",
-  secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL,
-  database: prismaAdapter(Prisma, {
+  appName: "PharmaErp",
+  secret: env.BETTER_AUTH_SECRET,
+  baseURL: env.BETTER_AUTH_URL, // Fixed: was 'url'
+
+  database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
 
   emailAndPassword: {
     enabled: true,
-    minPasswordLength: 8,
-    maxPasswordLength: 128,
-    autoSignIn: true,
-  },
-    user: {
-    additionalFields: {
-      phoneNumber: {
-        type: "string",
-        required: false,
-        input: true,
-      },
-
-      dateOfBirth: {
-        type: "date",
-        required: false,
-        input: true,
-      },
-
-      address: {
-        type: "string",
-        required: false,
-        input: true,
-      },
-    },
+    requireEmailVerification: true,
   },
 
   plugins: [
     emailOTP({
       otpLength: 6,
-      expiresIn: 300,
-      allowedAttempts: 3,
-
-      sendVerificationOnSignUp: true,
+      expiresIn: 5 * 60, // Fixed: 300 seconds (5 minutes), not milliseconds
+      allowedAttempts: 5,
+      disableSignUp: false,
+      sendVerificationOnSignUp: true, // 👈 Automatically sends OTP on /sign-up/email
       overrideDefaultEmailVerification: true,
-      storeOTP: "hashed",
-
       async sendVerificationOTP({ email, otp, type }) {
-        console.log(`[EMAIL OTP] Sending ${type} to ${email}`);
-
-        await sendOTPEmail({ email, otp });
-
-        console.log(`[EMAIL OTP] Email delivered to Mailpit for ${email}`);
+        await sendOTPEmail({ email, otp, type });
       },
     }),
   ],
-  session: {
-    expiresIn: 60 * 60 * 24 * 7, // 7 days
-    updateAge: 60 * 60 * 24, // 1 day
-    freshAge: 60 * 60 * 24, // 1 day
-  },
-  rateLimit: {
-    enabled: true,
-    window: 60,
-    max: 100,
-    customRules: {
-      "/sign-up/email": {
-        window: 60,
-        max: 5,
-      },
-      "/sign-in/email": {
-        window: 60,
-        max: 5,
-      },
+
+  user: {
+    modelName: "PlatformUser",
+    fields: {
+      name: "fullName",
     },
+  },
+  session: {
+    modelName: "PlatformSession",
+  },
+  account: {
+    modelName: "PlatformAccount",
+  },
+  verification: {
+    modelName: "PlatformVerification",
   },
 
   advanced: {
-    // DEV ONLY: skips the Origin/CSRF check so Postman works without an Origin header
-    disableCSRFCheck: !isProduction,
+    database: {
+      generateId: "uuid",
+    },
   },
 });

@@ -5,17 +5,31 @@ const transporter = nodemailer.createTransport({
   port: 1025,
   secure: false,
 });
+type OTPType = "sign-in" | "email-verification" | "forget-password" | "change-email";
 
-export async function sendOTPEmail({ email, otp }: { email: string; otp: string }) {
+interface SendOTPEmailOptions {
+  email: string;
+  otp: string;
+  type: OTPType;
+}
+
+export async function sendOTPEmail({
+  email,
+  otp,
+  type,
+}: SendOTPEmailOptions): Promise<void> {
   await transporter.sendMail({
     from: process.env.SMTP_FROM,
     to: email,
-    subject: "Your email verification OTP",
+    subject: "Your Pharma ERP Verification OTP",
     text: `Your OTP is ${otp}. It expires in 5 minutes.`,
     html: `
-      <h2>Email Verification</h2>
-      <h1>${otp}</h1>
-      <p>This OTP expires in 5 minutes.</p>
+      <div>
+        <h2>Pharma ERP Verification</h2>
+        <h1>${otp}</h1>
+        <p>Purpose: ${type}</p>
+        <p>This OTP expires in 5 minutes.</p>
+      </div>
     `,
   });
 }

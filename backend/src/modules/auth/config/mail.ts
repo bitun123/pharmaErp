@@ -1,5 +1,5 @@
 
-import { logger } from "better-auth";
+
 import nodemailer from "nodemailer";
 
 export const mailTransporter = nodemailer.createTransport({
@@ -16,12 +16,12 @@ export async function verifyMailConnection() {
   try {
     await mailTransporter.verify();
 
-    logger.info("Mailpit SMTP connected successfully");
+    console.log("Mailpit SMTP connected successfully");
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : String(error);
 
-    logger.error("Mailpit SMTP connection failed:", message);
+    console.error("Mailpit SMTP connection failed:", message);
 
     throw error;
   }
