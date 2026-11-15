@@ -5,12 +5,14 @@ const transporter = nodemailer.createTransport({
     host: "127.0.0.1",
     port: 1025,
     secure: false,
+     tls: { rejectUnauthorized: false },
 })
 
 export interface emailtype {
     email: string,
     otp: string,
     type:
+    |"sign-up"
     | "sign-in"
     | "email-verification"
     | "forget-password"

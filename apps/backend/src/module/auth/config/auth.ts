@@ -28,17 +28,15 @@ export const auth = betterAuth({
         minPasswordLength: 8,
         maxPasswordLength: 128,
         autoSignIn: true,
+
     },
     plugins: [
         emailOTP({
             otpLength: 6,
             expiresIn: 300,
             allowedAttempts: 3,
-
             sendVerificationOnSignUp: true,
-            overrideDefaultEmailVerification: true,
             storeOTP: "hashed",
-
             async sendVerificationOTP({ email, otp, type }: emailtype) {
                 console.log(`[EMAIL OTP] Sending ${type} to ${email}`);
                 await sendOTPEmail({ email, otp, type })
