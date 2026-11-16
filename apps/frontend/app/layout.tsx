@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { Toaster } from "@/components/ui/toast";
+import { QueryProvider } from "@/components/providers/query-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,6 +24,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
@@ -30,7 +33,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           defaultTheme="light"
           enableSystem
           disableTransitionOnChange >
-          {children}
+          <QueryProvider>
+            <Toaster>{children}</Toaster>
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

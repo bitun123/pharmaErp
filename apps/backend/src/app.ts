@@ -1,9 +1,27 @@
 import { toNodeHandler } from 'better-auth/node';
 import express from 'express';
+import cors from 'cors';
 import { auth } from './module/auth/config/auth.js';
 
 const app = express();
-app.all("/api/auth/*splat", toNodeHandler(auth));
-app.use(express.json())
+
+// FRONTEND_URL can hold several origins, comma-separated.
+const allowedOrigins = (process.env.FRONTEND_URL ?? 'http://localhost:3000')
+  .split(',')
+  .map((origin) => origin.trim().replace(/\/+$/, ''))
+  .filter(Boolean);
+
+// CORS must come before the auth handler so preflight (OPTIONS) requests are answered.
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true, // needed for the session cookie
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }),
+);
+
+app.all('/api/auth/*splat', toNodeHandler(auth));
+app.use(express.json());
 
 export default app;

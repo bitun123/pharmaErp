@@ -8,7 +8,7 @@ export const signInSchema = z.object({
   identifier: z
     .string()
     .trim()
-    .min(1, "Professional Email or 10-digit NPI is required.")
+    .min(1, " Email is required.")
     .refine(
       (val) => {
         const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
@@ -16,7 +16,7 @@ export const signInSchema = z.object({
         return isEmail || isNPI;
       },
       {
-        message: "Enter a valid email address (e.g. dr.smith@pharma.com) or a 10-digit NPI.",
+        message: "Enter a valid email address (e.g. dr.smith@pharma.com).",
       }
     ),
   password: z
@@ -27,3 +27,10 @@ export const signInSchema = z.object({
 });
 
 export type SignInFormData = z.infer<typeof signInSchema>;
+
+/** 6-digit one-time code (matches otpLength in the backend auth config). */
+export const otpSchema = z.object({
+  otp: z.string().trim().regex(/^\d{6}$/, "Enter the 6-digit code."),
+});
+
+export type OtpFormData = z.infer<typeof otpSchema>;

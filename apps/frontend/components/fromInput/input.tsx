@@ -3,6 +3,7 @@
 import * as React from "react";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import { cn } from "cn";
+import { Input } from "@/components/ui/input";
 
 export interface FormInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -52,7 +53,7 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
       <div className={cn("space-y-1.5 w-full", containerClassName)}>
         {/* Label & Label-Right Action Row */}
         {(label || labelRight) && (
-          <div className="flex items-center justify-between text-xs font-medium">
+          <div className="flex items-center justify-between text-sm font-medium">
             {label && (
               <label htmlFor={id} className="text-foreground flex items-center gap-1">
                 <span>{label}</span>
@@ -73,7 +74,7 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
           )}
 
           {/* Core Input Element */}
-          <input
+          <Input
             ref={ref}
             id={id}
             name={name}
@@ -83,7 +84,7 @@ export const FormInput = React.forwardRef<HTMLInputElement, FormInputProps>(
             aria-invalid={Boolean(error)}
             aria-describedby={error ? errorId : helperText ? helperId : undefined}
             className={cn(
-              "w-full h-11 text-sm rounded-lg border bg-background text-foreground placeholder:text-muted-foreground transition-all outline-none",
+              "w-full h-11 text-base sm:text-sm rounded-lg border bg-background text-foreground placeholder:text-muted-foreground transition-all outline-none",
               leftIcon ? "pl-10" : "pl-3.5",
               rightIcon || isPasswordType ? "pr-10" : "pr-3.5",
               error
