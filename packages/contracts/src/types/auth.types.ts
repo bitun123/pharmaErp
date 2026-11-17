@@ -1,3 +1,4 @@
+
 export interface AuthUser {
   id: string;
   name: string;
@@ -7,12 +8,30 @@ export interface AuthUser {
   role?: string;
 }
 
-export interface AuthSession {
-  user: AuthUser;
-  session: { id: string; expiresAt: string };
+export interface AuthSessionDetails {
+  id: string;
+  expiresAt: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export type OtpType = "sign-in" | "email-verification" | "forget-password";
+export interface AuthMembership {
+  id: string;
+  role: string;
+  title: string | null;
+  permissions: Record<string, boolean | "all">;
+}
+
+export interface AuthSession {
+  user: AuthUser;
+  session: AuthSessionDetails;
+  membership: AuthMembership | null;
+}
+
+export type OtpType =
+  | "sign-in"
+  | "email-verification"
+  | "forget-password";
 
 export interface SignInParams {
   identifier: string;
@@ -41,11 +60,7 @@ export interface ResetPasswordParams {
   password: string;
 }
 
-export interface SignInResponse {
-  redirect: boolean;
-  token: string;
-  user: AuthUser;
-}
+export interface SignInResponse extends AuthSession {}
 
 export interface SignUpResponse {
   token: string | null;

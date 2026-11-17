@@ -5,39 +5,41 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-  //user role enum 
+//user role enum 
 
-  enum PlatfromRole {
-    ADMIN 
-    STAFF 
-  }
- 
-//user
-model User {
-  id            String    @id
-  name          String
-  email         String
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  sessions      Session[]
-  accounts      Account[]
-  role          PlatfromRole @default(ADMIN)
-  @@unique([email])
-  @@map("user")
-  phoneNumber String?
-  dateOfBirth DateTime?
-  address     String?
+enum PlatformRole {
+  SUPER_ADMIN
+  ADMIN
+  STAFF
 }
 
+//user
+model User {
+  id            String       @id
+  name          String
+  email         String
+  emailVerified Boolean      @default(false)
+  image         String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  role          PlatformRole @default(SUPER_ADMIN)
+  phoneNumber   String?
+  dateOfBirth   DateTime?
+  address       String?
+  membership    Membership?
+
+  @@unique([email])
+  @@map("user")
+}
 
 model Session {
   id        String   @id
@@ -52,9 +54,9 @@ model Session {
 
   @@unique([token])
   @@index([userId])
+  @@index([expiresAt])
   @@map("session")
 }
-
 
 model Account {
   id                    String    @id
@@ -76,7 +78,6 @@ model Account {
   @@map("account")
 }
 
-
 model Verification {
   id         String   @id
   identifier String
@@ -87,4 +88,19 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Membership {
+  id          String       @id @default(cuid())
+  userId      String       @unique
+  role        PlatformRole @default(STAFF)
+  title       String?
+  permissions Json         @default("{}")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("membership")
 }

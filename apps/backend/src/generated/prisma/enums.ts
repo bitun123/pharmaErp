@@ -9,10 +9,10 @@
 * 🟢 You can import this file directly.
 */
 
-export const PlatfromRole = {
+export const PlatformRole = {
   SUPER_ADMIN: 'SUPER_ADMIN',
   ADMIN: 'ADMIN',
   STAFF: 'STAFF'
 } as const
 
-export type PlatfromRole = (typeof PlatfromRole)[keyof typeof PlatfromRole]
+export type PlatformRole = (typeof PlatformRole)[keyof typeof PlatformRole]
