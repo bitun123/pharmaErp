@@ -36,6 +36,7 @@ model User {
   dateOfBirth   DateTime?
   address       String?
   membership    Membership?
+  shop          Shop?
 
   @@unique([email])
   @@map("user")
@@ -103,4 +104,22 @@ model Membership {
   updatedAt DateTime @updatedAt
 
   @@map("membership")
+}
+
+model Shop {
+  id       String @id @default(cuid())
+  shopCode String @unique @default(dbgenerated("generate_shop_code()"))
+
+  name    String
+  slug    String  @unique
+  logo    String? // Shop logo URL
+  address String?
+
+  adminId String @unique
+  admin   User   @relation(fields: [adminId], references: [id])
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

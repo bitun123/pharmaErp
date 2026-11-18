@@ -9,13 +9,17 @@ export const createMembershipForUser = async (
   userId: string,
   role: PlatformRole,
 ): Promise<void> => {
+  if(!SHOP_ROLE_PERMISSIONS[role] ){
+     throw new Error(`Unknown role: ${role}`);
+  }
   const permissions = Object.fromEntries(
     (SHOP_ROLE_PERMISSIONS[role] ?? []).map((permission) => [permission, true]),
   );
 
+  
   await prisma.membership.upsert({
     where: { userId },
-    update: {},
+    update: {role,permissions},
     create: { userId, role, permissions },
   });
 };

@@ -66,3 +66,8 @@ export type Verification = Prisma.VerificationModel
  * 
  */
 export type Membership = Prisma.MembershipModel
+/**
+ * Model Shop
+ * 
+ */
+export type Shop = Prisma.ShopModel
