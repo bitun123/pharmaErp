@@ -18,6 +18,7 @@ export interface AuthSessionDetails {
 export interface AuthMembership {
   id: string;
   role: string;
+  shopId: string | null;
   title: string | null;
   permissions: Record<string, boolean | "all">;
 }

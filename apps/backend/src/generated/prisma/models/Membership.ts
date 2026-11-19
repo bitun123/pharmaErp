@@ -29,6 +29,7 @@ export type MembershipMinAggregateOutputType = {
   userId: string | null
   role: $Enums.PlatformRole | null
   title: string | null
+  shopId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -38,6 +39,7 @@ export type MembershipMaxAggregateOutputType = {
   userId: string | null
   role: $Enums.PlatformRole | null
   title: string | null
+  shopId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -48,6 +50,7 @@ export type MembershipCountAggregateOutputType = {
   role: number
   title: number
   permissions: number
+  shopId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -59,6 +62,7 @@ export type MembershipMinAggregateInputType = {
   userId?: true
   role?: true
   title?: true
+  shopId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -68,6 +72,7 @@ export type MembershipMaxAggregateInputType = {
   userId?: true
   role?: true
   title?: true
+  shopId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -78,6 +83,7 @@ export type MembershipCountAggregateInputType = {
   role?: true
   title?: true
   permissions?: true
+  shopId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -161,6 +167,7 @@ export type MembershipGroupByOutputType = {
   role: $Enums.PlatformRole
   title: string | null
   permissions: runtime.JsonValue
+  shopId: string | null
   createdAt: Date
   updatedAt: Date
   _count: MembershipCountAggregateOutputType | null
@@ -192,8 +199,10 @@ export type MembershipWhereInput = {
   role?: Prisma.EnumPlatformRoleFilter<"Membership"> | $Enums.PlatformRole
   title?: Prisma.StringNullableFilter<"Membership"> | string | null
   permissions?: Prisma.JsonFilter<"Membership">
+  shopId?: Prisma.StringNullableFilter<"Membership"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Membership"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Membership"> | Date | string
+  shop?: Prisma.XOR<Prisma.ShopNullableScalarRelationFilter, Prisma.ShopWhereInput> | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -203,8 +212,10 @@ export type MembershipOrderByWithRelationInput = {
   role?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
   permissions?: Prisma.SortOrder
+  shopId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  shop?: Prisma.ShopOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -217,8 +228,10 @@ export type MembershipWhereUniqueInput = Prisma.AtLeast<{
   role?: Prisma.EnumPlatformRoleFilter<"Membership"> | $Enums.PlatformRole
   title?: Prisma.StringNullableFilter<"Membership"> | string | null
   permissions?: Prisma.JsonFilter<"Membership">
+  shopId?: Prisma.StringNullableFilter<"Membership"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Membership"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Membership"> | Date | string
+  shop?: Prisma.XOR<Prisma.ShopNullableScalarRelationFilter, Prisma.ShopWhereInput> | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "userId">
 
@@ -228,6 +241,7 @@ export type MembershipOrderByWithAggregationInput = {
   role?: Prisma.SortOrder
   title?: Prisma.SortOrderInput | Prisma.SortOrder
   permissions?: Prisma.SortOrder
+  shopId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.MembershipCountOrderByAggregateInput
@@ -244,6 +258,7 @@ export type MembershipScalarWhereWithAggregatesInput = {
   role?: Prisma.EnumPlatformRoleWithAggregatesFilter<"Membership"> | $Enums.PlatformRole
   title?: Prisma.StringNullableWithAggregatesFilter<"Membership"> | string | null
   permissions?: Prisma.JsonWithAggregatesFilter<"Membership">
+  shopId?: Prisma.StringNullableWithAggregatesFilter<"Membership"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Membership"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Membership"> | Date | string
 }
@@ -255,6 +270,7 @@ export type MembershipCreateInput = {
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  shop?: Prisma.ShopCreateNestedOneWithoutMembersInput
   user: Prisma.UserCreateNestedOneWithoutMembershipInput
 }
 
@@ -264,6 +280,7 @@ export type MembershipUncheckedCreateInput = {
   role?: $Enums.PlatformRole
   title?: string | null
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  shopId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -275,6 +292,7 @@ export type MembershipUpdateInput = {
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shop?: Prisma.ShopUpdateOneWithoutMembersNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutMembershipNestedInput
 }
 
@@ -284,6 +302,7 @@ export type MembershipUncheckedUpdateInput = {
   role?: Prisma.EnumPlatformRoleFieldUpdateOperationsInput | $Enums.PlatformRole
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  shopId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -294,6 +313,7 @@ export type MembershipCreateManyInput = {
   role?: $Enums.PlatformRole
   title?: string | null
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  shopId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -313,6 +333,7 @@ export type MembershipUncheckedUpdateManyInput = {
   role?: Prisma.EnumPlatformRoleFieldUpdateOperationsInput | $Enums.PlatformRole
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  shopId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -328,6 +349,7 @@ export type MembershipCountOrderByAggregateInput = {
   role?: Prisma.SortOrder
   title?: Prisma.SortOrder
   permissions?: Prisma.SortOrder
+  shopId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -337,6 +359,7 @@ export type MembershipMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   role?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  shopId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -346,8 +369,19 @@ export type MembershipMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   role?: Prisma.SortOrder
   title?: Prisma.SortOrder
+  shopId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+}
+
+export type MembershipListRelationFilter = {
+  every?: Prisma.MembershipWhereInput
+  some?: Prisma.MembershipWhereInput
+  none?: Prisma.MembershipWhereInput
+}
+
+export type MembershipOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type MembershipCreateNestedOneWithoutUserInput = {
@@ -382,6 +416,48 @@ export type MembershipUncheckedUpdateOneWithoutUserNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.MembershipUpdateToOneWithWhereWithoutUserInput, Prisma.MembershipUpdateWithoutUserInput>, Prisma.MembershipUncheckedUpdateWithoutUserInput>
 }
 
+export type MembershipCreateNestedManyWithoutShopInput = {
+  create?: Prisma.XOR<Prisma.MembershipCreateWithoutShopInput, Prisma.MembershipUncheckedCreateWithoutShopInput> | Prisma.MembershipCreateWithoutShopInput[] | Prisma.MembershipUncheckedCreateWithoutShopInput[]
+  connectOrCreate?: Prisma.MembershipCreateOrConnectWithoutShopInput | Prisma.MembershipCreateOrConnectWithoutShopInput[]
+  createMany?: Prisma.MembershipCreateManyShopInputEnvelope
+  connect?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+}
+
+export type MembershipUncheckedCreateNestedManyWithoutShopInput = {
+  create?: Prisma.XOR<Prisma.MembershipCreateWithoutShopInput, Prisma.MembershipUncheckedCreateWithoutShopInput> | Prisma.MembershipCreateWithoutShopInput[] | Prisma.MembershipUncheckedCreateWithoutShopInput[]
+  connectOrCreate?: Prisma.MembershipCreateOrConnectWithoutShopInput | Prisma.MembershipCreateOrConnectWithoutShopInput[]
+  createMany?: Prisma.MembershipCreateManyShopInputEnvelope
+  connect?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+}
+
+export type MembershipUpdateManyWithoutShopNestedInput = {
+  create?: Prisma.XOR<Prisma.MembershipCreateWithoutShopInput, Prisma.MembershipUncheckedCreateWithoutShopInput> | Prisma.MembershipCreateWithoutShopInput[] | Prisma.MembershipUncheckedCreateWithoutShopInput[]
+  connectOrCreate?: Prisma.MembershipCreateOrConnectWithoutShopInput | Prisma.MembershipCreateOrConnectWithoutShopInput[]
+  upsert?: Prisma.MembershipUpsertWithWhereUniqueWithoutShopInput | Prisma.MembershipUpsertWithWhereUniqueWithoutShopInput[]
+  createMany?: Prisma.MembershipCreateManyShopInputEnvelope
+  set?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+  disconnect?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+  delete?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+  connect?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+  update?: Prisma.MembershipUpdateWithWhereUniqueWithoutShopInput | Prisma.MembershipUpdateWithWhereUniqueWithoutShopInput[]
+  updateMany?: Prisma.MembershipUpdateManyWithWhereWithoutShopInput | Prisma.MembershipUpdateManyWithWhereWithoutShopInput[]
+  deleteMany?: Prisma.MembershipScalarWhereInput | Prisma.MembershipScalarWhereInput[]
+}
+
+export type MembershipUncheckedUpdateManyWithoutShopNestedInput = {
+  create?: Prisma.XOR<Prisma.MembershipCreateWithoutShopInput, Prisma.MembershipUncheckedCreateWithoutShopInput> | Prisma.MembershipCreateWithoutShopInput[] | Prisma.MembershipUncheckedCreateWithoutShopInput[]
+  connectOrCreate?: Prisma.MembershipCreateOrConnectWithoutShopInput | Prisma.MembershipCreateOrConnectWithoutShopInput[]
+  upsert?: Prisma.MembershipUpsertWithWhereUniqueWithoutShopInput | Prisma.MembershipUpsertWithWhereUniqueWithoutShopInput[]
+  createMany?: Prisma.MembershipCreateManyShopInputEnvelope
+  set?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+  disconnect?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+  delete?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+  connect?: Prisma.MembershipWhereUniqueInput | Prisma.MembershipWhereUniqueInput[]
+  update?: Prisma.MembershipUpdateWithWhereUniqueWithoutShopInput | Prisma.MembershipUpdateWithWhereUniqueWithoutShopInput[]
+  updateMany?: Prisma.MembershipUpdateManyWithWhereWithoutShopInput | Prisma.MembershipUpdateManyWithWhereWithoutShopInput[]
+  deleteMany?: Prisma.MembershipScalarWhereInput | Prisma.MembershipScalarWhereInput[]
+}
+
 export type MembershipCreateWithoutUserInput = {
   id?: string
   role?: $Enums.PlatformRole
@@ -389,6 +465,7 @@ export type MembershipCreateWithoutUserInput = {
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
+  shop?: Prisma.ShopCreateNestedOneWithoutMembersInput
 }
 
 export type MembershipUncheckedCreateWithoutUserInput = {
@@ -396,6 +473,7 @@ export type MembershipUncheckedCreateWithoutUserInput = {
   role?: $Enums.PlatformRole
   title?: string | null
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  shopId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -423,10 +501,112 @@ export type MembershipUpdateWithoutUserInput = {
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shop?: Prisma.ShopUpdateOneWithoutMembersNestedInput
 }
 
 export type MembershipUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumPlatformRoleFieldUpdateOperationsInput | $Enums.PlatformRole
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  shopId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type MembershipCreateWithoutShopInput = {
+  id?: string
+  role?: $Enums.PlatformRole
+  title?: string | null
+  permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutMembershipInput
+}
+
+export type MembershipUncheckedCreateWithoutShopInput = {
+  id?: string
+  userId: string
+  role?: $Enums.PlatformRole
+  title?: string | null
+  permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type MembershipCreateOrConnectWithoutShopInput = {
+  where: Prisma.MembershipWhereUniqueInput
+  create: Prisma.XOR<Prisma.MembershipCreateWithoutShopInput, Prisma.MembershipUncheckedCreateWithoutShopInput>
+}
+
+export type MembershipCreateManyShopInputEnvelope = {
+  data: Prisma.MembershipCreateManyShopInput | Prisma.MembershipCreateManyShopInput[]
+  skipDuplicates?: boolean
+}
+
+export type MembershipUpsertWithWhereUniqueWithoutShopInput = {
+  where: Prisma.MembershipWhereUniqueInput
+  update: Prisma.XOR<Prisma.MembershipUpdateWithoutShopInput, Prisma.MembershipUncheckedUpdateWithoutShopInput>
+  create: Prisma.XOR<Prisma.MembershipCreateWithoutShopInput, Prisma.MembershipUncheckedCreateWithoutShopInput>
+}
+
+export type MembershipUpdateWithWhereUniqueWithoutShopInput = {
+  where: Prisma.MembershipWhereUniqueInput
+  data: Prisma.XOR<Prisma.MembershipUpdateWithoutShopInput, Prisma.MembershipUncheckedUpdateWithoutShopInput>
+}
+
+export type MembershipUpdateManyWithWhereWithoutShopInput = {
+  where: Prisma.MembershipScalarWhereInput
+  data: Prisma.XOR<Prisma.MembershipUpdateManyMutationInput, Prisma.MembershipUncheckedUpdateManyWithoutShopInput>
+}
+
+export type MembershipScalarWhereInput = {
+  AND?: Prisma.MembershipScalarWhereInput | Prisma.MembershipScalarWhereInput[]
+  OR?: Prisma.MembershipScalarWhereInput[]
+  NOT?: Prisma.MembershipScalarWhereInput | Prisma.MembershipScalarWhereInput[]
+  id?: Prisma.StringFilter<"Membership"> | string
+  userId?: Prisma.StringFilter<"Membership"> | string
+  role?: Prisma.EnumPlatformRoleFilter<"Membership"> | $Enums.PlatformRole
+  title?: Prisma.StringNullableFilter<"Membership"> | string | null
+  permissions?: Prisma.JsonFilter<"Membership">
+  shopId?: Prisma.StringNullableFilter<"Membership"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Membership"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Membership"> | Date | string
+}
+
+export type MembershipCreateManyShopInput = {
+  id?: string
+  userId: string
+  role?: $Enums.PlatformRole
+  title?: string | null
+  permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type MembershipUpdateWithoutShopInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumPlatformRoleFieldUpdateOperationsInput | $Enums.PlatformRole
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutMembershipNestedInput
+}
+
+export type MembershipUncheckedUpdateWithoutShopInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumPlatformRoleFieldUpdateOperationsInput | $Enums.PlatformRole
+  title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type MembershipUncheckedUpdateManyWithoutShopInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumPlatformRoleFieldUpdateOperationsInput | $Enums.PlatformRole
   title?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   permissions?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -442,8 +622,10 @@ export type MembershipSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   role?: boolean
   title?: boolean
   permissions?: boolean
+  shopId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  shop?: boolean | Prisma.Membership$shopArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["membership"]>
 
@@ -453,8 +635,10 @@ export type MembershipSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ex
   role?: boolean
   title?: boolean
   permissions?: boolean
+  shopId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  shop?: boolean | Prisma.Membership$shopArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["membership"]>
 
@@ -464,8 +648,10 @@ export type MembershipSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
   role?: boolean
   title?: boolean
   permissions?: boolean
+  shopId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  shop?: boolean | Prisma.Membership$shopArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["membership"]>
 
@@ -475,24 +661,29 @@ export type MembershipSelectScalar = {
   role?: boolean
   title?: boolean
   permissions?: boolean
+  shopId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type MembershipOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "role" | "title" | "permissions" | "createdAt" | "updatedAt", ExtArgs["result"]["membership"]>
+export type MembershipOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "role" | "title" | "permissions" | "shopId" | "createdAt" | "updatedAt", ExtArgs["result"]["membership"]>
 export type MembershipInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  shop?: boolean | Prisma.Membership$shopArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type MembershipIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  shop?: boolean | Prisma.Membership$shopArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 export type MembershipIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  shop?: boolean | Prisma.Membership$shopArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $MembershipPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Membership"
   objects: {
+    shop: Prisma.$ShopPayload<ExtArgs> | null
     user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -501,6 +692,7 @@ export type $MembershipPayload<ExtArgs extends runtime.Types.Extensions.Internal
     role: $Enums.PlatformRole
     title: string | null
     permissions: runtime.JsonValue
+    shopId: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["membership"]>
@@ -897,6 +1089,7 @@ readonly fields: MembershipFieldRefs;
  */
 export interface Prisma__MembershipClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  shop<T extends Prisma.Membership$shopArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Membership$shopArgs<ExtArgs>>): Prisma.Prisma__ShopClient<runtime.Types.Result.GetResult<Prisma.$ShopPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -932,6 +1125,7 @@ export interface MembershipFieldRefs {
   readonly role: Prisma.FieldRef<"Membership", 'PlatformRole'>
   readonly title: Prisma.FieldRef<"Membership", 'String'>
   readonly permissions: Prisma.FieldRef<"Membership", 'Json'>
+  readonly shopId: Prisma.FieldRef<"Membership", 'String'>
   readonly createdAt: Prisma.FieldRef<"Membership", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Membership", 'DateTime'>
 }
@@ -1332,6 +1526,25 @@ export type MembershipDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * Limit how many Memberships to delete.
    */
   limit?: number
+}
+
+/**
+ * Membership.shop
+ */
+export type Membership$shopArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Shop
+   */
+  select?: Prisma.ShopSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Shop
+   */
+  omit?: Prisma.ShopOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ShopInclude<ExtArgs> | null
+  where?: Prisma.ShopWhereInput
 }
 
 /**

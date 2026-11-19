@@ -4,6 +4,7 @@ import cors from 'cors';
 import { auth } from './module/auth/config/auth.js';
 import { helmetConfig } from './config/helmet.js';
 import mediaRoutes from './module/media/routes.js';
+import shopRoutes from './module/shop/routes.js';
 import { errorHandler } from './middlewares/error-handler.js';
 
 const app = express();
@@ -32,6 +33,9 @@ app.use(express.json());
 
 // Media routes (Upload, Delete, Image Details, Client Auth)
 app.use('/api/media', mediaRoutes);
+
+// Shop routes (Create, Read, Update, Delete, Search, Pagination) - all under /api/shop
+app.use('/api/shop', shopRoutes);
 
 // Global Error Handler
 app.use(errorHandler);

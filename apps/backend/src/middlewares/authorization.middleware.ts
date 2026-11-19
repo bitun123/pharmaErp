@@ -1,45 +1,30 @@
 import type { Request, Response, NextFunction } from "express";
-import { SHOP_ROLE_PERMISSIONS, SHOP_PERMISSIONS } from "../config/permissions.js";
+import type { Permission } from "../config/permissions.js";
+import { hasPermission } from "../module/auth/service/membership.service.js";
+import { AppError } from "../error/app-error.js";
 
-type ShopRole = keyof typeof SHOP_ROLE_PERMISSIONS;
-type ShopPermission = (typeof SHOP_PERMISSIONS)[keyof typeof SHOP_PERMISSIONS];
-
-export const authorize = (requiredPermission: ShopPermission) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    // 1. Ensure user is authenticated
+/**
+ * Requires `requiredPermission` on the user's membership (loaded by `authenticate`).
+ * Must run after `authenticate`.
+ */
+export const authorize = (requiredPermission: Permission) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     if (!req.user) {
-      return res.status(401).json({
-        message: "Unauthorized: Authentication required",
-      });
+      return next(new AppError("UNAUTHORIZED", "Authentication required.", 401));
     }
 
-    // 2. Ensure role exists and is a valid string
-    if (typeof req.user.role !== "string" || !req.user.role.trim()) {
-      return res.status(403).json({
-        message: "Forbidden: No valid role assigned",
-      });
+    if (!req.user.membershipId && req.user.role !== "SUPER_ADMIN") {
+      return next(
+        new AppError("NO_MEMBERSHIP", "No membership found for this account.", 403),
+      );
     }
 
-    // 3. Normalize & safely verify key exists on SHOP_ROLE_PERMISSIONS (prevents prototype lookup)
-    const normalizedRole = req.user.role.trim().toUpperCase();
-    if (!Object.hasOwn(SHOP_ROLE_PERMISSIONS, normalizedRole)) {
-      return res.status(403).json({
-        message: "Forbidden: Invalid role",
-      });
+    if (!hasPermission(req.user.permissions, requiredPermission)) {
+      return next(
+        new AppError("FORBIDDEN", "Insufficient permissions.", 403),
+      );
     }
 
-    const permissions = SHOP_ROLE_PERMISSIONS[normalizedRole as ShopRole] as readonly string[];
-
-    // 4. Check permission (with optional wildcard support)
-    const hasPermission =
-      permissions.includes("*") || permissions.includes(requiredPermission);
-
-    if (!hasPermission) {
-      return res.status(403).json({
-        message: "Forbidden: Insufficient permissions",
-      });
-    }
-
-    return next();
+    next();
   };
 };

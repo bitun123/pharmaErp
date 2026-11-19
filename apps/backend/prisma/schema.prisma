@@ -98,11 +98,16 @@ model Membership {
   title       String?
   permissions Json         @default("{}")
 
+  // Shop this member belongs to. Null for platform-level users (SUPER_ADMIN).
+  shopId String?
+  shop   Shop?   @relation(fields: [shopId], references: [id], onDelete: SetNull)
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([shopId])
   @@map("membership")
 }
 
@@ -117,6 +122,8 @@ model Shop {
 
   adminId String @unique
   admin   User   @relation(fields: [adminId], references: [id])
+
+  members Membership[]
 
   isActive Boolean @default(true)
 

@@ -973,6 +973,7 @@ export const MembershipScalarFieldEnum = {
   role: 'role',
   title: 'title',
   permissions: 'permissions',
+  shopId: 'shopId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

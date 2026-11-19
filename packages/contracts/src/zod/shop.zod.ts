@@ -57,6 +57,31 @@ export const createShopSchema = z.object({
     .or(z.literal(""))
     .transform((val) => (val ? val : undefined)),
 
+  adminName: z
+    .string({
+      error: "Admin name is required.",
+    })
+    .trim()
+    .min(2, "Admin name must be at least 2 characters long.")
+    .max(100, "Admin name cannot exceed 100 characters."),
+
+  adminEmail: z
+    .string({
+      error: "Admin email is required.",
+    })
+    .trim()
+    .toLowerCase()
+    .email("Please provide a valid email address."),
+
+  adminPassword: z
+    .string()
+    .min(8, "Password must be at least 8 characters long.")
+    .max(128, "Password cannot exceed 128 characters.")
+    .optional()
+    .nullable()
+    .or(z.literal(""))
+    .transform((val) => (val ? val : undefined)),
+
   adminId: z
     .string()
     .trim()
@@ -71,3 +96,42 @@ export const createShopSchema = z.object({
  * Allows updating any subset of the shop fields.
  */
 export const updateShopSchema = createShopSchema.partial();
+
+/**
+ * Zod validation schema for an admin setting their password using the invitation/setup link.
+ */
+export const setAdminPasswordSchema = z.object({
+  email: z
+    .string({
+      error: "Email is required.",
+    })
+    .trim()
+    .toLowerCase()
+    .email("Please provide a valid email address."),
+  token: z
+    .string({
+      error: "Token is required.",
+    })
+    .trim()
+    .min(1, "Token cannot be empty."),
+  password: z
+    .string({
+      error: "Password is required.",
+    })
+    .min(8, "Password must be at least 8 characters long.")
+    .max(128, "Password cannot exceed 128 characters."),
+});
+
+/**
+ * Zod validation schema for listing shops with search, filter, pagination, and sorting.
+ */
+export const listShopsQuerySchema = z.object({
+  page: z.coerce.number().int().positive().default(1),
+  limit: z.coerce.number().int().positive().max(100).default(10),
+  search: z.string().trim().optional(),
+  isActive: z.enum(["true", "false", "all"]).optional(),
+  sortBy: z
+    .enum(["createdAt", "updatedAt", "name", "shopCode"])
+    .default("createdAt"),
+  sortOrder: z.enum(["asc", "desc"]).default("desc"),
+});

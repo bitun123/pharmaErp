@@ -12,6 +12,20 @@ export const errorHandler: ErrorRequestHandler = (
     return next(err);
   }
 
+  // Handle Zod validation errors
+  if (err?.name === "ZodError" && Array.isArray(err?.issues)) {
+    return res.status(400).json({
+      code: "VALIDATION_ERROR",
+      message:
+        err.issues.map((i: any) => i.message).join(", ") || "Validation failed.",
+      errors: err.issues.map((i: any) => ({
+        field: i.path?.join(".") || "unknown",
+        message: i.message,
+      })),
+      statusCode: 400,
+    });
+  }
+
   const isAppError = err instanceof AppError;
 
   const statusCode = isAppError ? err.statusCode : 500;
