@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums.js"
-import type * as Prisma from "../internal/prismaNamespace.js"
+import type * as $Enums from "../enums"
+import type * as Prisma from "../internal/prismaNamespace"
 
 /**
  * Model Verification
@@ -238,7 +238,7 @@ export type VerificationScalarWhereWithAggregatesInput = {
 }
 
 export type VerificationCreateInput = {
-  id: string
+  id?: string
   identifier: string
   value: string
   expiresAt: Date | string
@@ -247,7 +247,7 @@ export type VerificationCreateInput = {
 }
 
 export type VerificationUncheckedCreateInput = {
-  id: string
+  id?: string
   identifier: string
   value: string
   expiresAt: Date | string
@@ -274,7 +274,7 @@ export type VerificationUncheckedUpdateInput = {
 }
 
 export type VerificationCreateManyInput = {
-  id: string
+  id?: string
   identifier: string
   value: string
   expiresAt: Date | string

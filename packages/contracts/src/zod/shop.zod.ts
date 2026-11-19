@@ -82,12 +82,6 @@ export const createShopSchema = z.object({
     .or(z.literal(""))
     .transform((val) => (val ? val : undefined)),
 
-  adminId: z
-    .string()
-    .trim()
-    .min(1, "Admin ID cannot be empty.")
-    .optional(),
-
   isActive: z.boolean().default(true).optional(),
 });
 
@@ -95,7 +89,11 @@ export const createShopSchema = z.object({
  * Zod validation schema for updating an existing Shop.
  * Allows updating any subset of the shop fields.
  */
-export const updateShopSchema = createShopSchema.partial();
+export const updateShopSchema = createShopSchema.partial().extend({
+  // Only used when reassigning the shop to a different existing admin.
+  // Not part of create: the admin is created together with the shop.
+  adminId: z.string().trim().min(1, "Admin ID cannot be empty.").optional(),
+});
 
 /**
  * Zod validation schema for an admin setting their password using the invitation/setup link.

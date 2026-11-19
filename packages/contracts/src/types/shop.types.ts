@@ -4,7 +4,7 @@ import type {
   updateShopSchema,
   listShopsQuerySchema,
   setAdminPasswordSchema,
-} from "../zod/shop.zod.js";
+} from "../zod/shop.zod";
 
 /**
  * Type inferred from `createShopSchema`.
@@ -41,7 +41,6 @@ export interface Shop {
   createdAt: Date | string;
   updatedAt: Date | string;
   admin?: {
-    id: string;
     name: string;
     email: string;
     role?: string;

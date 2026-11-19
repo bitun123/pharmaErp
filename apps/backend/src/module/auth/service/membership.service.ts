@@ -1,3 +1,4 @@
+import { AppError } from "../../../error/app-error.js";
 import type { AuthMembership } from "@repo/contracts/types/auth.types";
 import { prisma } from "../config/database.js";
 import {
@@ -64,32 +65,43 @@ export const createMembershipForUser = async (
   userId: string,
   role: PlatformRole,
   shopId?: string | null,
+  db: Pick<typeof prisma, "membership"> = prisma,
 ): Promise<void> => {
-  if (!isRoleKey(role)) {
-    throw new Error(`Unknown role: ${role}`);
-  }
+  try {
+    if (!isRoleKey(role)) {
+      throw new Error(`Unknown role: ${role}`);
+    }
 
-  const existing = await prisma.membership.findUnique({
-    where: { userId },
-    select: { role: true },
-  });
-  const shopPart = shopId === undefined ? {} : { shopId };
-
-  if (!existing) {
-    await prisma.membership.create({
-      data: { userId, role, permissions: buildPermissions(role), ...shopPart },
+    const existing = await db.membership.findUnique({
+      where: { userId },
+      select: { role: true },
     });
-    return;
-  }
+    const shopPart = shopId === undefined ? {} : { shopId };
 
-  await prisma.membership.update({
-    where: { userId },
-    data: {
-      role,
-      ...(existing.role !== role ? { permissions: buildPermissions(role) } : {}),
-      ...shopPart,
-    },
-  });
+    if (!existing) {
+      await db.membership.create({
+        data: { userId, role, permissions: buildPermissions(role), ...shopPart },
+      });
+      return;
+    }
+
+    await db.membership.update({
+      where: { userId },
+      data: {
+        role,
+        ...(existing.role !== role ? { permissions: buildPermissions(role) } : {}),
+        ...shopPart,
+      },
+    });
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    console.error("createMembershipForUser failed:", error);
+    throw new AppError(
+      "MEMBERSHIP_SAVE_FAILED",
+      "Failed to save the membership.",
+      500
+    );
+  }
 };
 
 /** Alias that reads better where an existing user's role is being changed. */
@@ -98,22 +110,32 @@ export const syncMembershipRole = createMembershipForUser;
 export const getMembershipForUser = async (
   userId: string,
 ): Promise<AuthMembership | null> => {
-  const membership = await prisma.membership.findUnique({
-    where: { userId },
-  });
+  try {
+    const membership = await prisma.membership.findUnique({
+      where: { userId },
+    });
 
-  if (!membership) return null;
+    if (!membership) return null;
 
-  return {
-    id: membership.id,
-    role: membership.role,
-    shopId: membership.shopId,
-    title: membership.title,
-    permissions: resolveEffectivePermissions(
-      membership.role,
-      membership.permissions,
-    ),
-  };
+    return {
+      id: membership.id,
+      role: membership.role,
+      shopId: membership.shopId,
+      title: membership.title,
+      permissions: resolveEffectivePermissions(
+        membership.role,
+        membership.permissions,
+      ),
+    };
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    console.error("getMembershipForUser failed:", error);
+    throw new AppError(
+      "MEMBERSHIP_FETCH_FAILED",
+      "Failed to fetch the membership.",
+      500
+    );
+  }
 };
 
 // Re-exported so callers have one import for role templates.

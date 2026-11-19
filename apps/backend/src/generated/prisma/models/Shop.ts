@@ -9,8 +9,8 @@
  * 🟢 You can import this file directly.
  */
 import type * as runtime from "@prisma/client/runtime/client"
-import type * as $Enums from "../enums.js"
-import type * as Prisma from "../internal/prismaNamespace.js"
+import type * as $Enums from "../enums"
+import type * as Prisma from "../internal/prismaNamespace"
 
 /**
  * Model Shop
@@ -35,6 +35,7 @@ export type ShopMinAggregateOutputType = {
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
+  deletedAt: Date | null
 }
 
 export type ShopMaxAggregateOutputType = {
@@ -48,6 +49,7 @@ export type ShopMaxAggregateOutputType = {
   isActive: boolean | null
   createdAt: Date | null
   updatedAt: Date | null
+  deletedAt: Date | null
 }
 
 export type ShopCountAggregateOutputType = {
@@ -61,6 +63,7 @@ export type ShopCountAggregateOutputType = {
   isActive: number
   createdAt: number
   updatedAt: number
+  deletedAt: number
   _all: number
 }
 
@@ -76,6 +79,7 @@ export type ShopMinAggregateInputType = {
   isActive?: true
   createdAt?: true
   updatedAt?: true
+  deletedAt?: true
 }
 
 export type ShopMaxAggregateInputType = {
@@ -89,6 +93,7 @@ export type ShopMaxAggregateInputType = {
   isActive?: true
   createdAt?: true
   updatedAt?: true
+  deletedAt?: true
 }
 
 export type ShopCountAggregateInputType = {
@@ -102,6 +107,7 @@ export type ShopCountAggregateInputType = {
   isActive?: true
   createdAt?: true
   updatedAt?: true
+  deletedAt?: true
   _all?: true
 }
 
@@ -188,6 +194,7 @@ export type ShopGroupByOutputType = {
   isActive: boolean
   createdAt: Date
   updatedAt: Date
+  deletedAt: Date | null
   _count: ShopCountAggregateOutputType | null
   _min: ShopMinAggregateOutputType | null
   _max: ShopMaxAggregateOutputType | null
@@ -222,6 +229,7 @@ export type ShopWhereInput = {
   isActive?: Prisma.BoolFilter<"Shop"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"Shop"> | Date | string | null
   admin?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   members?: Prisma.MembershipListRelationFilter
 }
@@ -237,6 +245,7 @@ export type ShopOrderByWithRelationInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   admin?: Prisma.UserOrderByWithRelationInput
   members?: Prisma.MembershipOrderByRelationAggregateInput
 }
@@ -255,6 +264,7 @@ export type ShopWhereUniqueInput = Prisma.AtLeast<{
   isActive?: Prisma.BoolFilter<"Shop"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"Shop"> | Date | string | null
   admin?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   members?: Prisma.MembershipListRelationFilter
 }, "id" | "shopCode" | "slug" | "adminId">
@@ -270,6 +280,7 @@ export type ShopOrderByWithAggregationInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ShopCountOrderByAggregateInput
   _max?: Prisma.ShopMaxOrderByAggregateInput
   _min?: Prisma.ShopMinOrderByAggregateInput
@@ -289,6 +300,7 @@ export type ShopScalarWhereWithAggregatesInput = {
   isActive?: Prisma.BoolWithAggregatesFilter<"Shop"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Shop"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Shop"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Shop"> | Date | string | null
 }
 
 export type ShopCreateInput = {
@@ -301,6 +313,7 @@ export type ShopCreateInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   admin: Prisma.UserCreateNestedOneWithoutShopInput
   members?: Prisma.MembershipCreateNestedManyWithoutShopInput
 }
@@ -316,6 +329,7 @@ export type ShopUncheckedCreateInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   members?: Prisma.MembershipUncheckedCreateNestedManyWithoutShopInput
 }
 
@@ -329,6 +343,7 @@ export type ShopUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin?: Prisma.UserUpdateOneRequiredWithoutShopNestedInput
   members?: Prisma.MembershipUpdateManyWithoutShopNestedInput
 }
@@ -344,6 +359,7 @@ export type ShopUncheckedUpdateInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   members?: Prisma.MembershipUncheckedUpdateManyWithoutShopNestedInput
 }
 
@@ -358,6 +374,7 @@ export type ShopCreateManyInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
 }
 
 export type ShopUpdateManyMutationInput = {
@@ -370,6 +387,7 @@ export type ShopUpdateManyMutationInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ShopUncheckedUpdateManyInput = {
@@ -383,6 +401,7 @@ export type ShopUncheckedUpdateManyInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ShopNullableScalarRelationFilter = {
@@ -401,6 +420,7 @@ export type ShopCountOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type ShopMaxOrderByAggregateInput = {
@@ -414,6 +434,7 @@ export type ShopMaxOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type ShopMinOrderByAggregateInput = {
@@ -427,6 +448,7 @@ export type ShopMinOrderByAggregateInput = {
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type ShopCreateNestedOneWithoutAdminInput = {
@@ -487,6 +509,7 @@ export type ShopCreateWithoutAdminInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   members?: Prisma.MembershipCreateNestedManyWithoutShopInput
 }
 
@@ -500,6 +523,7 @@ export type ShopUncheckedCreateWithoutAdminInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   members?: Prisma.MembershipUncheckedCreateNestedManyWithoutShopInput
 }
 
@@ -529,6 +553,7 @@ export type ShopUpdateWithoutAdminInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   members?: Prisma.MembershipUpdateManyWithoutShopNestedInput
 }
 
@@ -542,6 +567,7 @@ export type ShopUncheckedUpdateWithoutAdminInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   members?: Prisma.MembershipUncheckedUpdateManyWithoutShopNestedInput
 }
 
@@ -555,6 +581,7 @@ export type ShopCreateWithoutMembersInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   admin: Prisma.UserCreateNestedOneWithoutShopInput
 }
 
@@ -569,6 +596,7 @@ export type ShopUncheckedCreateWithoutMembersInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
 }
 
 export type ShopCreateOrConnectWithoutMembersInput = {
@@ -597,6 +625,7 @@ export type ShopUpdateWithoutMembersInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   admin?: Prisma.UserUpdateOneRequiredWithoutShopNestedInput
 }
 
@@ -611,6 +640,7 @@ export type ShopUncheckedUpdateWithoutMembersInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -655,6 +685,7 @@ export type ShopSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  deletedAt?: boolean
   admin?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   members?: boolean | Prisma.Shop$membersArgs<ExtArgs>
   _count?: boolean | Prisma.ShopCountOutputTypeDefaultArgs<ExtArgs>
@@ -671,6 +702,7 @@ export type ShopSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  deletedAt?: boolean
   admin?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["shop"]>
 
@@ -685,6 +717,7 @@ export type ShopSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  deletedAt?: boolean
   admin?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["shop"]>
 
@@ -699,9 +732,10 @@ export type ShopSelectScalar = {
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  deletedAt?: boolean
 }
 
-export type ShopOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "shopCode" | "name" | "slug" | "logo" | "address" | "adminId" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["shop"]>
+export type ShopOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "shopCode" | "name" | "slug" | "logo" | "address" | "adminId" | "isActive" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["shop"]>
 export type ShopInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   admin?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   members?: boolean | Prisma.Shop$membersArgs<ExtArgs>
@@ -731,6 +765,7 @@ export type $ShopPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     isActive: boolean
     createdAt: Date
     updatedAt: Date
+    deletedAt: Date | null
   }, ExtArgs["result"]["shop"]>
   composites: {}
 }
@@ -1166,6 +1201,7 @@ export interface ShopFieldRefs {
   readonly isActive: Prisma.FieldRef<"Shop", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Shop", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Shop", 'DateTime'>
+  readonly deletedAt: Prisma.FieldRef<"Shop", 'DateTime'>
 }
     
 

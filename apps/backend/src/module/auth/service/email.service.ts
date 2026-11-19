@@ -1,3 +1,4 @@
+import { AppError } from "../../../error/app-error.js";
 import nodemailer from "nodemailer";
 
 const isProduction = process.env.NODE_ENV === "production";
@@ -34,17 +35,27 @@ const subjects: Record<emailtype["type"], string> = {
 };
 
 export async function sendOTPEmail({ email, otp, type }: emailtype) {
-    await transporter.sendMail({
-        from: process.env.SMTP_FROM,
-        to: email,
-        subject: subjects[type] ?? "Your verification code",
-        text: `Your OTP is ${otp}. It expires in 5 minutes.`,
-        html: `
-      <h2>${subjects[type] ?? "Verification code"}</h2>
-      <h1>${otp}</h1>
-      <p>This OTP expires in 5 minutes.</p>
-    `,
-    });
+  try {
+      await transporter.sendMail({
+          from: process.env.SMTP_FROM,
+          to: email,
+          subject: subjects[type] ?? "Your verification code",
+          text: `Your OTP is ${otp}. It expires in 5 minutes.`,
+          html: `
+        <h2>${subjects[type] ?? "Verification code"}</h2>
+        <h1>${otp}</h1>
+        <p>This OTP expires in 5 minutes.</p>
+      `,
+      });
+  } catch (error) {
+    if (error instanceof AppError) throw error;
+    console.error("sendOTPEmail failed:", error);
+    throw new AppError(
+      "OTP_EMAIL_FAILED",
+      "Failed to send the verification email.",
+      500
+    );
+  }
 }
 
 export interface SendShopAdminCredentialsEmailInput {
@@ -63,7 +74,7 @@ export async function sendShopAdminWelcomeEmail({
     setupUrl,
 }: SendShopAdminCredentialsEmailInput) {
     const publicWebUrl = (process.env.PUBLIC_WEB_URL || "http://localhost:3000").replace(/\/+$/, "");
-    const loginUrl = `${publicWebUrl}/sign-in`;
+    const loginUrl = `${publicWebUrl}/signin`;
 
     try {
         if (password) {
