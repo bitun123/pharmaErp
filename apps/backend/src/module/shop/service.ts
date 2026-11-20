@@ -194,7 +194,7 @@ export const createShopService = async (input: CreateShopInput) => {
       await createMembershipForUser(adminUser.id, "ADMIN", created.id, tx);
       return created;
     });
-
+//testing
     const setupUrl = setupToken
       ? `${publicWebUrl}/set-password?token=${setupToken}&email=${encodeURIComponent(normalizedEmail)}`
       : undefined;
