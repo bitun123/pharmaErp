@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { BriefcaseMedical, Lock, ShieldCheck } from "lucide-react";
+import { Lock, ShieldCheck } from "lucide-react";
+import { Logo } from "@/components/brand/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 /**
@@ -16,17 +17,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         <div className="pointer-events-none absolute -bottom-24 -left-24 size-96 rounded-full bg-primary/10 blur-3xl" />
 
         <header className="relative z-10 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-white/10">
-              <BriefcaseMedical className="size-5" />
-            </div>
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-wider">Pharma ERP</div>
-              <div className="font-mono text-[10px] uppercase tracking-wider opacity-70">
-                Enterprise Core v4.8
-              </div>
-            </div>
-          </div>
+          <Logo theme="dark" className="h-12" priority />
 
           <div className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-medium uppercase">
             <ShieldCheck className="size-3.5" />
@@ -86,16 +77,8 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         <ThemeToggle className="absolute top-4 right-4 sm:top-6 sm:right-6" />
 
         {/* Compact brand, shown only when the brand panel is hidden */}
-        <div className="mb-4 flex items-center gap-3 lg:hidden">
-          <div className="flex size-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <BriefcaseMedical className="size-5" />
-          </div>
-          <div>
-            <div className="text-sm font-semibold uppercase tracking-wider">Pharma ERP</div>
-            <div className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              Enterprise Core v4.8
-            </div>
-          </div>
+        <div className="mb-4 lg:hidden">
+          <Logo className="h-12" priority />
         </div>
 
         {children}

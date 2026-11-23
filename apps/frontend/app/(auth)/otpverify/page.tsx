@@ -53,7 +53,7 @@ export default function OtpVerifyPage() {
   // No session means the user skipped sign-in (or it expired): go back.
   React.useEffect(() => {
     if (!session.isPending && !session.isError && !session.data) {
-      router.replace("/auth/signin");
+      router.replace("/signin");
     }
   }, [session.isPending, session.isError, session.data, router]);
 
