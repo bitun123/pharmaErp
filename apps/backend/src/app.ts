@@ -6,7 +6,7 @@ import { helmetConfig } from './config/helmet.js';
 import mediaRoutes from './module/media/routes.js';
 import shopRoutes from './module/shop/routes.js';
 import { errorHandler } from './middlewares/error-handler.js';
-
+import { httpLogger } from './config/logger.js';
 const app = express();
 
 // FRONTEND_URL can hold several origins, comma-separated.
@@ -30,7 +30,7 @@ app.use(helmetConfig);
 
 app.all('/api/auth/*splat', toNodeHandler(auth));
 app.use(express.json());
-
+app.use(httpLogger);
 // Media routes (Upload, Delete, Image Details, Client Auth)
 app.use('/api/media', mediaRoutes);
 
