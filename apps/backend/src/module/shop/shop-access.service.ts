@@ -35,15 +35,14 @@ export const assertUserShopAccess = async (userId: string): Promise<void> => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
-      role: true,
       shop: { select: { isActive: true, deletedAt: true } },
       membership: {
-        select: { shop: { select: { isActive: true, deletedAt: true } } },
+        select: { role: true, shop: { select: { isActive: true, deletedAt: true } } },
       },
     },
   });
 
-  if (!user || user.role === "SUPER_ADMIN") return;
+  if (!user || user.membership?.role === "SUPER_ADMIN") return;
 
   const error =
     getShopAccessError(user.membership?.shop) ?? getShopAccessError(user.shop);

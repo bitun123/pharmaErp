@@ -5,13 +5,13 @@ import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./database.js"
 import { APIError } from "better-auth/api";
-import { emailOTP, customSession } from "better-auth/plugins";
+import { emailOTP, customSession, twoFactor } from "better-auth/plugins";
 import { emailtype, sendOTPEmail } from './../service/email.service.js';
-import type { PlatformRole } from "../../../generated/prisma/enums.js";
 import { createAuthSessionResponse } from '../service/auth-session.service.js';
 import { createMembershipForUser, getMembershipForUser } from '../service/membership.service.js';
 import { assertUserShopAccess } from '../../shop/shop-access.service.js';
 import { AppError } from '../../../error/app-error.js';
+import { logger } from '../../../config/logger.js';
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -43,12 +43,6 @@ export const auth = betterAuth({
     },
     user: {
         additionalFields: {
-            // Maps to the PlatformRole enum; never settable from client input.
-            role: {
-                type: "string",
-                required: false,
-                input: false,
-            },
             phoneNumber: { type: "string", required: false },
             address: { type: "string", required: false },
             dateOfBirth: { type: "date", required: false },
@@ -75,11 +69,13 @@ export const auth = betterAuth({
         },
         user: {
             create: {
+                // Every account needs the emailed sign-in code. Better Auth's own default is false
+                // and the field cannot be set from client input.
+                before: async (user) => ({ data: { ...user, twoFactorEnabled: true } }),
                 after: async (user) => {
-                    await createMembershipForUser(
-                        user.id,
-                        (user.role as PlatformRole | undefined) ?? "STAFF",
-                    );
+                    // Every self-created account starts with the least-privileged role.
+                    // Higher roles are only ever granted server-side (e.g. when a shop is created).
+                    await createMembershipForUser(user.id, "STAFF");
                 },
             },
         },
@@ -94,9 +90,27 @@ export const auth = betterAuth({
             // Not awaited: awaiting makes response time reveal whether the email exists.
             async sendVerificationOTP({ email, otp, type }: emailtype) {
                 void sendOTPEmail({ email, otp, type }).catch((error) => {
-                    console.error(`[EMAIL OTP] Failed to send ${type} email:`, error);
+                    logger.error({ err: error, type }, "Failed to send OTP email");
                 });
             }
+        }),
+        // Sign-in code: after a correct password NO session is created. Only a short-lived
+        // "code pending" cookie is issued, and the session starts once /two-factor/verify-otp
+        // succeeds. Users who already hold a valid session are not asked again.
+        twoFactor({
+            totpOptions: { disable: true },
+            otpOptions: {
+                period: 5, // minutes, matches the "expires in 5 minutes" email text
+                digits: 6,
+                allowedAttempts: 3,
+                storeOTP: "hashed",
+                // Not awaited: awaiting makes response time reveal whether the email exists.
+                async sendOTP({ user, otp }) {
+                    void sendOTPEmail({ email: user.email, otp, type: "sign-in" }).catch((error) => {
+                        logger.error({ err: error, type: "sign-in" }, "Failed to send OTP email");
+                    });
+                },
+            },
         }),
         customSession(async ({ user, session }) => {
             const membership = await getMembershipForUser(user.id);
@@ -106,6 +120,16 @@ export const auth = betterAuth({
                 membership,
             })
         }),],
+    // The code requirement is mandatory: users must not be able to switch it off or set up
+    // authenticator apps / backup codes on their own.
+    disabledPaths: [
+        "/two-factor/enable",
+        "/two-factor/disable",
+        "/two-factor/get-totp-uri",
+        "/two-factor/verify-totp",
+        "/two-factor/generate-backup-codes",
+        "/two-factor/verify-backup-code",
+    ],
     session: {
         expiresIn: 60 * 60 * 24 * 7,
         updateAge: 60 * 60 * 24, // 1 day

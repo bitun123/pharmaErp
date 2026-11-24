@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import path from "node:path";
 import { getImageKit, getImageKitConfig } from "../config/imagekit.js";
 import { AppError } from "../error/app-error.js";
+import { logger } from "../config/logger.js";
 
 /**
  * The only ImageKit folders this API will write to, read from or delete in.
@@ -195,7 +196,7 @@ export const uploadImage = async (
       width: response.width,
     };
   } catch (error: any) {
-    console.error("[ImageKit Upload Error]:", error);
+    logger.error({ err: error }, "ImageKit upload failed");
     const message = error?.message || "Failed to upload image to ImageKit.";
     throw new AppError("IMAGEKIT_UPLOAD_ERROR", message, error?.status || 502);
   }
@@ -230,7 +231,7 @@ export const deleteImage = async (fileId: string): Promise<{ success: boolean; f
       );
     }
 
-    console.error("[ImageKit Delete Error]:", error);
+    logger.error({ err: error }, "ImageKit delete failed");
     const message = error?.message || "Failed to delete image from ImageKit.";
     throw new AppError("IMAGEKIT_DELETE_ERROR", message, error?.status || 502);
   }
@@ -256,7 +257,7 @@ export const getImageDetails = async (fileId: string) => {
     if (error?.status === 404 || error?.message?.toLowerCase().includes("not found")) {
       throw new AppError("FILE_NOT_FOUND", `File with ID '${cleanFileId}' was not found.`, 404);
     }
-    console.error("[ImageKit GetDetails Error]:", error);
+    logger.error({ err: error }, "ImageKit get details failed");
     throw new AppError(
       "IMAGEKIT_DETAILS_ERROR",
       error?.message || "Failed to retrieve file details.",
@@ -320,7 +321,7 @@ export const markFileAttached = async (fileId: string, tags?: string[] | null): 
     await getImageKit().updateFileDetails(fileId, { tags: next });
   } catch (error) {
     // Not fatal: the record is saved; the file just stays tagged and the cleanup script re-checks it.
-    console.error("[ImageKit markFileAttached Error]:", error);
+    logger.error({ err: error }, "ImageKit markFileAttached failed");
   }
 };
 
@@ -335,7 +336,7 @@ export const safeDeleteFile = async (fileId: string | null | undefined): Promise
     await getImageKit().deleteFile(fileId.trim());
   } catch (error: any) {
     if (error?.status === 404 || error?.message?.toLowerCase().includes("not found")) return;
-    console.error("[ImageKit safeDeleteFile Error]:", error);
+    logger.error({ err: error }, "ImageKit safeDeleteFile failed");
   }
 };
 

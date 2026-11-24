@@ -14,18 +14,13 @@ import {
 import { AuthCard } from "@/components/auth/auth-card";
 import { FormInput } from "@/components/fromInput/input";
 import { useResetPassword, useSendResetCode } from "@/features/auth/hooks/useHooks";
+import { maskEmail } from "@/lib/user";
 
 const RESEND_SECONDS = 30;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 type EmailForm = { email: string };
 type ResetForm = { otp: string; password: string; confirmPassword: string };
-
-/** dr.smith@pharma.com -> d***@pharma.com */
-function maskEmail(email: string) {
-  const [name = "", domain = ""] = email.split("@");
-  return `${name.slice(0, 1)}***@${domain}`;
-}
 
 export default function ForgotPasswordPage() {
   const sendCode = useSendResetCode();

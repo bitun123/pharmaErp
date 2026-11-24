@@ -8,6 +8,7 @@ import {
   isValidPermission,
 } from "../../../config/permissions.js";
 import type { PlatformRole } from "../../../generated/prisma/enums.js";
+import { logger } from "../../../config/logger.js";
 
 export type PermissionMap = Record<string, boolean | "all">;
 
@@ -96,7 +97,7 @@ export const createMembershipForUser = async (
     });
   } catch (error) {
     if (error instanceof AppError) throw error;
-    console.error("createMembershipForUser failed:", error);
+    logger.error({ err: error }, "createMembershipForUser failed");
     throw new AppError(
       "MEMBERSHIP_SAVE_FAILED",
       "Failed to save the membership.",
@@ -130,7 +131,7 @@ export const getMembershipForUser = async (
     };
   } catch (error) {
     if (error instanceof AppError) throw error;
-    console.error("getMembershipForUser failed:", error);
+    logger.error({ err: error }, "getMembershipForUser failed");
     throw new AppError(
       "MEMBERSHIP_FETCH_FAILED",
       "Failed to fetch the membership.",

@@ -56,7 +56,8 @@ export const ModelName = {
   Account: 'Account',
   Verification: 'Verification',
   Membership: 'Membership',
-  Shop: 'Shop'
+  Shop: 'Shop',
+  TwoFactor: 'TwoFactor'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -86,7 +87,8 @@ export const UserScalarFieldEnum = {
   role: 'role',
   phoneNumber: 'phoneNumber',
   dateOfBirth: 'dateOfBirth',
-  address: 'address'
+  address: 'address',
+  twoFactorEnabled: 'twoFactorEnabled'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -167,6 +169,19 @@ export const ShopScalarFieldEnum = {
 } as const
 
 export type ShopScalarFieldEnum = (typeof ShopScalarFieldEnum)[keyof typeof ShopScalarFieldEnum]
+
+
+export const TwoFactorScalarFieldEnum = {
+  id: 'id',
+  secret: 'secret',
+  backupCodes: 'backupCodes',
+  userId: 'userId',
+  verified: 'verified',
+  failedVerificationCount: 'failedVerificationCount',
+  lockedUntil: 'lockedUntil'
+} as const
+
+export type TwoFactorScalarFieldEnum = (typeof TwoFactorScalarFieldEnum)[keyof typeof TwoFactorScalarFieldEnum]
 
 
 export const SortOrder = {

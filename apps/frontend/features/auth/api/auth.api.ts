@@ -5,12 +5,12 @@ import type {
   ResetPasswordParams,
   SendOtpParams,
   SignInParams,
-  SignInResponse,
+  SignInResult,
   SignUpParams,
   SignUpResponse,
   SuccessResponse,
-  VerifyEmailParams,
-  VerifyEmailResponse,
+  TwoFactorChallenge,
+  VerifyTwoFactorParams,
 } from "@repo/contracts";
 
 // Better Auth is mounted at /api/auth on the backend.
@@ -34,10 +34,15 @@ export async function signIn(params: SignInParams) {
     throw new ApiError("Sign-in with NPI is not available yet. Use your email.", 400);
   }
 
-  return api.post<SignInResponse>(
+  return api.post<SignInResult>(
     `${AUTH}/sign-in/email`,
     { email: identifier.toLowerCase(), password: params.password },
   );
+}
+
+/** True when sign-in needs the emailed code before a session exists. */
+export function isTwoFactorChallenge(result: SignInResult): result is TwoFactorChallenge {
+  return "twoFactorRedirect" in result && result.twoFactorRedirect === true;
 }
 
 export function signUp(params: SignUpParams) {
@@ -74,11 +79,14 @@ export function sendOtp(params: SendOtpParams) {
   });
 }
 
-export function verifyEmail(params: VerifyEmailParams) {
-  return api.post<VerifyEmailResponse>(`${AUTH}/email-otp/verify-email`, {
-    email: params.email.trim().toLowerCase(),
-    otp: params.otp.trim(),
-  });
+/** Emails the sign-in code. Needs the "code pending" cookie set by a correct password. */
+export function sendTwoFactorOtp() {
+  return api.post<{ status: boolean }>(`${AUTH}/two-factor/send-otp`, {});
+}
+
+/** Checks the emailed code. On success the server starts the session. */
+export function verifyTwoFactorOtp(params: VerifyTwoFactorParams) {
+  return api.post<{ token: string }>(`${AUTH}/two-factor/verify-otp`, { code: params.code.trim() });
 }
 
 export function resetPassword(params: ResetPasswordParams) {

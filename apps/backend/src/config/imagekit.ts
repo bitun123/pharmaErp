@@ -1,4 +1,5 @@
 import ImageKit from "imagekit";
+import { logger } from "./logger.js";
 
 /**
  * Validates and retrieves ImageKit configuration from environment variables.
@@ -30,8 +31,8 @@ export const getImageKit = (): ImageKit => {
   const { publicKey, privateKey, urlEndpoint } = getImageKitConfig();
 
   if (!publicKey || !privateKey || !urlEndpoint) {
-    console.warn(
-      "[ImageKit Warning]: ImageKit credentials are incomplete in environment variables (IMAGEKIT_PUBLIC_KEY, IMAGEKIT_PRIVATE_KEY, IMAGEKIT_URL_ENDPOINT). Uploads and deletes will fail until configured."
+    logger.warn(
+      "ImageKit credentials are incomplete in environment variables (IMAGEKIT_PUBLIC_KEY, IMAGEKIT_PRIVATE_KEY, IMAGEKIT_URL_ENDPOINT). Uploads and deletes will fail until configured."
     );
   }
 

@@ -63,6 +63,21 @@ export interface ResetPasswordParams {
 
 export interface SignInResponse extends AuthSession {}
 
+/**
+ * Returned instead of a session when the account needs an emailed sign-in code.
+ * No session exists yet: the code is verified with `verifyTwoFactorOtp`.
+ */
+export interface TwoFactorChallenge {
+  twoFactorRedirect: true;
+  twoFactorMethods: string[];
+}
+
+export type SignInResult = SignInResponse | TwoFactorChallenge;
+
+export interface VerifyTwoFactorParams {
+  code: string;
+}
+
 export interface SignUpResponse {
   token: string | null;
   user: AuthUser;

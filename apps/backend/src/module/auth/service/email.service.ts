@@ -1,19 +1,6 @@
 import { AppError } from "../../../error/app-error.js";
-import nodemailer from "nodemailer";
-
-const isProduction = process.env.NODE_ENV === "production";
-
-// Defaults point at a local Mailpit instance; override via SMTP_* env vars elsewhere.
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST ?? "127.0.0.1",
-    port: Number(process.env.SMTP_PORT ?? 1025),
-    secure: process.env.SMTP_SECURE === "true",
-    auth:
-        process.env.SMTP_USER && process.env.SMTP_PASS
-            ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-            : undefined,
-    tls: { rejectUnauthorized: isProduction },
-})
+import { mailTransporter } from "../config/mail.js";
+import { logger } from "../../../config/logger.js";
 
 export interface emailtype {
     email: string,
@@ -36,7 +23,7 @@ const subjects: Record<emailtype["type"], string> = {
 
 export async function sendOTPEmail({ email, otp, type }: emailtype) {
   try {
-      await transporter.sendMail({
+      await mailTransporter.sendMail({
           from: process.env.SMTP_FROM,
           to: email,
           subject: subjects[type] ?? "Your verification code",
@@ -49,7 +36,7 @@ export async function sendOTPEmail({ email, otp, type }: emailtype) {
       });
   } catch (error) {
     if (error instanceof AppError) throw error;
-    console.error("sendOTPEmail failed:", error);
+    logger.error({ err: error }, "sendOTPEmail failed");
     throw new AppError(
       "OTP_EMAIL_FAILED",
       "Failed to send the verification email.",
@@ -78,7 +65,7 @@ export async function sendShopAdminWelcomeEmail({
 
     try {
         if (password) {
-            await transporter.sendMail({
+            await mailTransporter.sendMail({
                 from: process.env.SMTP_FROM,
                 to: email,
                 subject: `Welcome to ${shopName} - Your Admin Credentials`,
@@ -98,7 +85,7 @@ export async function sendShopAdminWelcomeEmail({
         `,
             });
         } else if (setupUrl) {
-            await transporter.sendMail({
+            await mailTransporter.sendMail({
                 from: process.env.SMTP_FROM,
                 to: email,
                 subject: `Welcome to ${shopName} - Set Up Your Admin Account`,
@@ -117,6 +104,7 @@ export async function sendShopAdminWelcomeEmail({
             });
         }
     } catch (error) {
-        console.warn(`[EMAIL WARNING] Could not send welcome email to ${email}:`, (error as any)?.message || error);
+        // The recipient address is deliberately not logged.
+        logger.warn({ err: error }, "Could not send the shop admin welcome email");
     }
 }

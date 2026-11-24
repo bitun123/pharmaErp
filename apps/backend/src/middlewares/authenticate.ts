@@ -4,7 +4,6 @@ import { auth } from "../module/auth/config/auth.js";
 import { prisma } from "../module/auth/config/database.js";
 import { resolveEffectivePermissions, type PermissionMap } from "../module/auth/service/membership.service.js";
 import { AppError } from "../error/app-error.js";
-import { isRoleKey } from "../config/permissions.js";
 import { getShopAccessError } from "../module/shop/shop-access.service.js";
 import type { PlatformRole } from "../generated/prisma/enums.js";
 
@@ -38,23 +37,20 @@ export const authenticate = async (
       throw new AppError("UNAUTHORIZED", "Authentication required.", 401);
     }
 
-    const rawRole = String(
-      (session.user as Record<string, unknown>).role ?? "STAFF",
-    )
-      .trim()
-      .toUpperCase();
-    // Unknown roles fall back to the least-privileged one.
-    const role: PlatformRole = isRoleKey(rawRole) ? rawRole : "STAFF";
-
     const membership = await prisma.membership.findUnique({
       where: { userId: session.user.id },
       select: {
         id: true,
+        role: true,
         shopId: true,
         permissions: true,
         shop: { select: { isActive: true, deletedAt: true } },
       },
     });
+
+    // The role comes only from the membership. A user without one is treated as the
+    // least-privileged role and is refused by `authorize` (NO_MEMBERSHIP).
+    const role: PlatformRole = membership?.role ?? "STAFF";
 
     // A blocked or deleted shop locks out its admin and staff immediately,
     // even if they still hold a valid session. Super admins are never tied to a shop.

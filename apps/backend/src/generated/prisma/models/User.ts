@@ -36,6 +36,7 @@ export type UserMinAggregateOutputType = {
   phoneNumber: string | null
   dateOfBirth: Date | null
   address: string | null
+  twoFactorEnabled: boolean | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -50,6 +51,7 @@ export type UserMaxAggregateOutputType = {
   phoneNumber: string | null
   dateOfBirth: Date | null
   address: string | null
+  twoFactorEnabled: boolean | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -64,6 +66,7 @@ export type UserCountAggregateOutputType = {
   phoneNumber: number
   dateOfBirth: number
   address: number
+  twoFactorEnabled: number
   _all: number
 }
 
@@ -80,6 +83,7 @@ export type UserMinAggregateInputType = {
   phoneNumber?: true
   dateOfBirth?: true
   address?: true
+  twoFactorEnabled?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -94,6 +98,7 @@ export type UserMaxAggregateInputType = {
   phoneNumber?: true
   dateOfBirth?: true
   address?: true
+  twoFactorEnabled?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -108,6 +113,7 @@ export type UserCountAggregateInputType = {
   phoneNumber?: true
   dateOfBirth?: true
   address?: true
+  twoFactorEnabled?: true
   _all?: true
 }
 
@@ -195,6 +201,7 @@ export type UserGroupByOutputType = {
   phoneNumber: string | null
   dateOfBirth: Date | null
   address: string | null
+  twoFactorEnabled: boolean | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -230,10 +237,12 @@ export type UserWhereInput = {
   phoneNumber?: Prisma.StringNullableFilter<"User"> | string | null
   dateOfBirth?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   address?: Prisma.StringNullableFilter<"User"> | string | null
+  twoFactorEnabled?: Prisma.BoolNullableFilter<"User"> | boolean | null
   sessions?: Prisma.SessionListRelationFilter
   accounts?: Prisma.AccountListRelationFilter
   membership?: Prisma.XOR<Prisma.MembershipNullableScalarRelationFilter, Prisma.MembershipWhereInput> | null
   shop?: Prisma.XOR<Prisma.ShopNullableScalarRelationFilter, Prisma.ShopWhereInput> | null
+  twoFactors?: Prisma.TwoFactorListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -248,10 +257,12 @@ export type UserOrderByWithRelationInput = {
   phoneNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
+  twoFactorEnabled?: Prisma.SortOrderInput | Prisma.SortOrder
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   accounts?: Prisma.AccountOrderByRelationAggregateInput
   membership?: Prisma.MembershipOrderByWithRelationInput
   shop?: Prisma.ShopOrderByWithRelationInput
+  twoFactors?: Prisma.TwoFactorOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -269,10 +280,12 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   phoneNumber?: Prisma.StringNullableFilter<"User"> | string | null
   dateOfBirth?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   address?: Prisma.StringNullableFilter<"User"> | string | null
+  twoFactorEnabled?: Prisma.BoolNullableFilter<"User"> | boolean | null
   sessions?: Prisma.SessionListRelationFilter
   accounts?: Prisma.AccountListRelationFilter
   membership?: Prisma.XOR<Prisma.MembershipNullableScalarRelationFilter, Prisma.MembershipWhereInput> | null
   shop?: Prisma.XOR<Prisma.ShopNullableScalarRelationFilter, Prisma.ShopWhereInput> | null
+  twoFactors?: Prisma.TwoFactorListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -287,6 +300,7 @@ export type UserOrderByWithAggregationInput = {
   phoneNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
+  twoFactorEnabled?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -307,6 +321,7 @@ export type UserScalarWhereWithAggregatesInput = {
   phoneNumber?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   dateOfBirth?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   address?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  twoFactorEnabled?: Prisma.BoolNullableWithAggregatesFilter<"User"> | boolean | null
 }
 
 export type UserCreateInput = {
@@ -321,10 +336,12 @@ export type UserCreateInput = {
   phoneNumber?: string | null
   dateOfBirth?: Date | string | null
   address?: string | null
+  twoFactorEnabled?: boolean | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   membership?: Prisma.MembershipCreateNestedOneWithoutUserInput
   shop?: Prisma.ShopCreateNestedOneWithoutAdminInput
+  twoFactors?: Prisma.TwoFactorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -339,10 +356,12 @@ export type UserUncheckedCreateInput = {
   phoneNumber?: string | null
   dateOfBirth?: Date | string | null
   address?: string | null
+  twoFactorEnabled?: boolean | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   membership?: Prisma.MembershipUncheckedCreateNestedOneWithoutUserInput
   shop?: Prisma.ShopUncheckedCreateNestedOneWithoutAdminInput
+  twoFactors?: Prisma.TwoFactorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -357,10 +376,12 @@ export type UserUpdateInput = {
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  twoFactorEnabled?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   membership?: Prisma.MembershipUpdateOneWithoutUserNestedInput
   shop?: Prisma.ShopUpdateOneWithoutAdminNestedInput
+  twoFactors?: Prisma.TwoFactorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -375,10 +396,12 @@ export type UserUncheckedUpdateInput = {
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  twoFactorEnabled?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   membership?: Prisma.MembershipUncheckedUpdateOneWithoutUserNestedInput
   shop?: Prisma.ShopUncheckedUpdateOneWithoutAdminNestedInput
+  twoFactors?: Prisma.TwoFactorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -393,6 +416,7 @@ export type UserCreateManyInput = {
   phoneNumber?: string | null
   dateOfBirth?: Date | string | null
   address?: string | null
+  twoFactorEnabled?: boolean | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -407,6 +431,7 @@ export type UserUpdateManyMutationInput = {
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  twoFactorEnabled?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -421,6 +446,7 @@ export type UserUncheckedUpdateManyInput = {
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  twoFactorEnabled?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -435,6 +461,7 @@ export type UserCountOrderByAggregateInput = {
   phoneNumber?: Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  twoFactorEnabled?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -449,6 +476,7 @@ export type UserMaxOrderByAggregateInput = {
   phoneNumber?: Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  twoFactorEnabled?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -463,6 +491,7 @@ export type UserMinOrderByAggregateInput = {
   phoneNumber?: Prisma.SortOrder
   dateOfBirth?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  twoFactorEnabled?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -497,6 +526,10 @@ export type EnumPlatformRoleFieldUpdateOperationsInput = {
 
 export type NullableDateTimeFieldUpdateOperationsInput = {
   set?: Date | string | null
+}
+
+export type NullableBoolFieldUpdateOperationsInput = {
+  set?: boolean | null
 }
 
 export type UserCreateNestedOneWithoutSessionsInput = {
@@ -557,6 +590,20 @@ export type UserUpdateOneWithoutShopNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutShopInput, Prisma.UserUpdateWithoutShopInput>, Prisma.UserUncheckedUpdateWithoutShopInput>
 }
 
+export type UserCreateNestedOneWithoutTwoFactorsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTwoFactorsInput, Prisma.UserUncheckedCreateWithoutTwoFactorsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTwoFactorsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutTwoFactorsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTwoFactorsInput, Prisma.UserUncheckedCreateWithoutTwoFactorsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTwoFactorsInput
+  upsert?: Prisma.UserUpsertWithoutTwoFactorsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTwoFactorsInput, Prisma.UserUpdateWithoutTwoFactorsInput>, Prisma.UserUncheckedUpdateWithoutTwoFactorsInput>
+}
+
 export type UserCreateWithoutSessionsInput = {
   id?: string
   name: string
@@ -569,9 +616,11 @@ export type UserCreateWithoutSessionsInput = {
   phoneNumber?: string | null
   dateOfBirth?: Date | string | null
   address?: string | null
+  twoFactorEnabled?: boolean | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   membership?: Prisma.MembershipCreateNestedOneWithoutUserInput
   shop?: Prisma.ShopCreateNestedOneWithoutAdminInput
+  twoFactors?: Prisma.TwoFactorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -586,9 +635,11 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   phoneNumber?: string | null
   dateOfBirth?: Date | string | null
   address?: string | null
+  twoFactorEnabled?: boolean | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   membership?: Prisma.MembershipUncheckedCreateNestedOneWithoutUserInput
   shop?: Prisma.ShopUncheckedCreateNestedOneWithoutAdminInput
+  twoFactors?: Prisma.TwoFactorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -619,9 +670,11 @@ export type UserUpdateWithoutSessionsInput = {
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  twoFactorEnabled?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   membership?: Prisma.MembershipUpdateOneWithoutUserNestedInput
   shop?: Prisma.ShopUpdateOneWithoutAdminNestedInput
+  twoFactors?: Prisma.TwoFactorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -636,9 +689,11 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  twoFactorEnabled?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   membership?: Prisma.MembershipUncheckedUpdateOneWithoutUserNestedInput
   shop?: Prisma.ShopUncheckedUpdateOneWithoutAdminNestedInput
+  twoFactors?: Prisma.TwoFactorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAccountsInput = {
@@ -653,9 +708,11 @@ export type UserCreateWithoutAccountsInput = {
   phoneNumber?: string | null
   dateOfBirth?: Date | string | null
   address?: string | null
+  twoFactorEnabled?: boolean | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   membership?: Prisma.MembershipCreateNestedOneWithoutUserInput
   shop?: Prisma.ShopCreateNestedOneWithoutAdminInput
+  twoFactors?: Prisma.TwoFactorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -670,9 +727,11 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   phoneNumber?: string | null
   dateOfBirth?: Date | string | null
   address?: string | null
+  twoFactorEnabled?: boolean | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   membership?: Prisma.MembershipUncheckedCreateNestedOneWithoutUserInput
   shop?: Prisma.ShopUncheckedCreateNestedOneWithoutAdminInput
+  twoFactors?: Prisma.TwoFactorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -703,9 +762,11 @@ export type UserUpdateWithoutAccountsInput = {
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  twoFactorEnabled?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   membership?: Prisma.MembershipUpdateOneWithoutUserNestedInput
   shop?: Prisma.ShopUpdateOneWithoutAdminNestedInput
+  twoFactors?: Prisma.TwoFactorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -720,9 +781,11 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  twoFactorEnabled?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   membership?: Prisma.MembershipUncheckedUpdateOneWithoutUserNestedInput
   shop?: Prisma.ShopUncheckedUpdateOneWithoutAdminNestedInput
+  twoFactors?: Prisma.TwoFactorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutMembershipInput = {
@@ -737,9 +800,11 @@ export type UserCreateWithoutMembershipInput = {
   phoneNumber?: string | null
   dateOfBirth?: Date | string | null
   address?: string | null
+  twoFactorEnabled?: boolean | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   shop?: Prisma.ShopCreateNestedOneWithoutAdminInput
+  twoFactors?: Prisma.TwoFactorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutMembershipInput = {
@@ -754,9 +819,11 @@ export type UserUncheckedCreateWithoutMembershipInput = {
   phoneNumber?: string | null
   dateOfBirth?: Date | string | null
   address?: string | null
+  twoFactorEnabled?: boolean | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   shop?: Prisma.ShopUncheckedCreateNestedOneWithoutAdminInput
+  twoFactors?: Prisma.TwoFactorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutMembershipInput = {
@@ -787,9 +854,11 @@ export type UserUpdateWithoutMembershipInput = {
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  twoFactorEnabled?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   shop?: Prisma.ShopUpdateOneWithoutAdminNestedInput
+  twoFactors?: Prisma.TwoFactorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutMembershipInput = {
@@ -804,9 +873,11 @@ export type UserUncheckedUpdateWithoutMembershipInput = {
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  twoFactorEnabled?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   shop?: Prisma.ShopUncheckedUpdateOneWithoutAdminNestedInput
+  twoFactors?: Prisma.TwoFactorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutShopInput = {
@@ -821,9 +892,11 @@ export type UserCreateWithoutShopInput = {
   phoneNumber?: string | null
   dateOfBirth?: Date | string | null
   address?: string | null
+  twoFactorEnabled?: boolean | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   membership?: Prisma.MembershipCreateNestedOneWithoutUserInput
+  twoFactors?: Prisma.TwoFactorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutShopInput = {
@@ -838,9 +911,11 @@ export type UserUncheckedCreateWithoutShopInput = {
   phoneNumber?: string | null
   dateOfBirth?: Date | string | null
   address?: string | null
+  twoFactorEnabled?: boolean | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   membership?: Prisma.MembershipUncheckedCreateNestedOneWithoutUserInput
+  twoFactors?: Prisma.TwoFactorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutShopInput = {
@@ -871,9 +946,11 @@ export type UserUpdateWithoutShopInput = {
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  twoFactorEnabled?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   membership?: Prisma.MembershipUpdateOneWithoutUserNestedInput
+  twoFactors?: Prisma.TwoFactorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutShopInput = {
@@ -888,9 +965,103 @@ export type UserUncheckedUpdateWithoutShopInput = {
   phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  twoFactorEnabled?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   membership?: Prisma.MembershipUncheckedUpdateOneWithoutUserNestedInput
+  twoFactors?: Prisma.TwoFactorUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutTwoFactorsInput = {
+  id?: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role?: $Enums.PlatformRole
+  phoneNumber?: string | null
+  dateOfBirth?: Date | string | null
+  address?: string | null
+  twoFactorEnabled?: boolean | null
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  membership?: Prisma.MembershipCreateNestedOneWithoutUserInput
+  shop?: Prisma.ShopCreateNestedOneWithoutAdminInput
+}
+
+export type UserUncheckedCreateWithoutTwoFactorsInput = {
+  id?: string
+  name: string
+  email: string
+  emailVerified?: boolean
+  image?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  role?: $Enums.PlatformRole
+  phoneNumber?: string | null
+  dateOfBirth?: Date | string | null
+  address?: string | null
+  twoFactorEnabled?: boolean | null
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  membership?: Prisma.MembershipUncheckedCreateNestedOneWithoutUserInput
+  shop?: Prisma.ShopUncheckedCreateNestedOneWithoutAdminInput
+}
+
+export type UserCreateOrConnectWithoutTwoFactorsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutTwoFactorsInput, Prisma.UserUncheckedCreateWithoutTwoFactorsInput>
+}
+
+export type UserUpsertWithoutTwoFactorsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutTwoFactorsInput, Prisma.UserUncheckedUpdateWithoutTwoFactorsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutTwoFactorsInput, Prisma.UserUncheckedCreateWithoutTwoFactorsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutTwoFactorsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutTwoFactorsInput, Prisma.UserUncheckedUpdateWithoutTwoFactorsInput>
+}
+
+export type UserUpdateWithoutTwoFactorsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumPlatformRoleFieldUpdateOperationsInput | $Enums.PlatformRole
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  twoFactorEnabled?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  membership?: Prisma.MembershipUpdateOneWithoutUserNestedInput
+  shop?: Prisma.ShopUpdateOneWithoutAdminNestedInput
+}
+
+export type UserUncheckedUpdateWithoutTwoFactorsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  role?: Prisma.EnumPlatformRoleFieldUpdateOperationsInput | $Enums.PlatformRole
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  twoFactorEnabled?: Prisma.NullableBoolFieldUpdateOperationsInput | boolean | null
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  membership?: Prisma.MembershipUncheckedUpdateOneWithoutUserNestedInput
+  shop?: Prisma.ShopUncheckedUpdateOneWithoutAdminNestedInput
 }
 
 
@@ -901,11 +1072,13 @@ export type UserUncheckedUpdateWithoutShopInput = {
 export type UserCountOutputType = {
   sessions: number
   accounts: number
+  twoFactors: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   accounts?: boolean | UserCountOutputTypeCountAccountsArgs
+  twoFactors?: boolean | UserCountOutputTypeCountTwoFactorsArgs
 }
 
 /**
@@ -932,6 +1105,13 @@ export type UserCountOutputTypeCountAccountsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.AccountWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountTwoFactorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TwoFactorWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -945,10 +1125,12 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   phoneNumber?: boolean
   dateOfBirth?: boolean
   address?: boolean
+  twoFactorEnabled?: boolean
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   membership?: boolean | Prisma.User$membershipArgs<ExtArgs>
   shop?: boolean | Prisma.User$shopArgs<ExtArgs>
+  twoFactors?: boolean | Prisma.User$twoFactorsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -964,6 +1146,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   phoneNumber?: boolean
   dateOfBirth?: boolean
   address?: boolean
+  twoFactorEnabled?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -978,6 +1161,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   phoneNumber?: boolean
   dateOfBirth?: boolean
   address?: boolean
+  twoFactorEnabled?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -992,14 +1176,16 @@ export type UserSelectScalar = {
   phoneNumber?: boolean
   dateOfBirth?: boolean
   address?: boolean
+  twoFactorEnabled?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "createdAt" | "updatedAt" | "role" | "phoneNumber" | "dateOfBirth" | "address", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "createdAt" | "updatedAt" | "role" | "phoneNumber" | "dateOfBirth" | "address" | "twoFactorEnabled", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   membership?: boolean | Prisma.User$membershipArgs<ExtArgs>
   shop?: boolean | Prisma.User$shopArgs<ExtArgs>
+  twoFactors?: boolean | Prisma.User$twoFactorsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1012,6 +1198,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     accounts: Prisma.$AccountPayload<ExtArgs>[]
     membership: Prisma.$MembershipPayload<ExtArgs> | null
     shop: Prisma.$ShopPayload<ExtArgs> | null
+    twoFactors: Prisma.$TwoFactorPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1025,6 +1212,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     phoneNumber: string | null
     dateOfBirth: Date | null
     address: string | null
+    twoFactorEnabled: boolean | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1423,6 +1611,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   accounts<T extends Prisma.User$accountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   membership<T extends Prisma.User$membershipArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$membershipArgs<ExtArgs>>): Prisma.Prisma__MembershipClient<runtime.Types.Result.GetResult<Prisma.$MembershipPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   shop<T extends Prisma.User$shopArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$shopArgs<ExtArgs>>): Prisma.Prisma__ShopClient<runtime.Types.Result.GetResult<Prisma.$ShopPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  twoFactors<T extends Prisma.User$twoFactorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$twoFactorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TwoFactorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1463,6 +1652,7 @@ export interface UserFieldRefs {
   readonly phoneNumber: Prisma.FieldRef<"User", 'String'>
   readonly dateOfBirth: Prisma.FieldRef<"User", 'DateTime'>
   readonly address: Prisma.FieldRef<"User", 'String'>
+  readonly twoFactorEnabled: Prisma.FieldRef<"User", 'Boolean'>
 }
     
 
@@ -1939,6 +2129,30 @@ export type User$shopArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs 
    */
   include?: Prisma.ShopInclude<ExtArgs> | null
   where?: Prisma.ShopWhereInput
+}
+
+/**
+ * User.twoFactors
+ */
+export type User$twoFactorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TwoFactor
+   */
+  select?: Prisma.TwoFactorSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TwoFactor
+   */
+  omit?: Prisma.TwoFactorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TwoFactorInclude<ExtArgs> | null
+  where?: Prisma.TwoFactorWhereInput
+  orderBy?: Prisma.TwoFactorOrderByWithRelationInput | Prisma.TwoFactorOrderByWithRelationInput[]
+  cursor?: Prisma.TwoFactorWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TwoFactorScalarFieldEnum | Prisma.TwoFactorScalarFieldEnum[]
 }
 
 /**

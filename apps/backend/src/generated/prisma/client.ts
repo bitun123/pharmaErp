@@ -71,3 +71,8 @@ export type Membership = Prisma.MembershipModel
  * 
  */
 export type Shop = Prisma.ShopModel
+/**
+ * Model TwoFactor
+ * 
+ */
+export type TwoFactor = Prisma.TwoFactorModel

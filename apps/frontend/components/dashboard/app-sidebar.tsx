@@ -18,20 +18,20 @@ import {
   SidebarRail,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { useSession, useSignOut } from "@/features/auth/hooks/useHooks";
-import { formatRole, getInitials } from "@/lib/user";
+import { useSignOut } from "@/features/auth/hooks/useHooks";
+import { hasPermission } from "@/lib/permissions";
+import { formatRole, getInitials, type CurrentUser } from "@/lib/user";
 
-const NAV = [
+// `permission` hides an item from users who lack it (UI only: the API enforces it too).
+const NAV: { href: string; label: string; icon: typeof Store; permission?: string }[] = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/shops", label: "Shop Management", icon: Store },
+  { href: "/shops", label: "Shop Management", icon: Store, permission: "shop:read" },
 ];
 
-export function AppSidebar() {
+export function AppSidebar({ user }: { user: CurrentUser }) {
   const pathname = usePathname();
   const { isMobile, setOpenMobile } = useSidebar();
-  const session = useSession();
   const signOut = useSignOut();
 
   // Close the mobile drawer after any navigation (link click, back button, redirect).
@@ -39,8 +39,8 @@ export function AppSidebar() {
     if (isMobile) setOpenMobile(false);
   }, [pathname, isMobile, setOpenMobile]);
 
-  const user = session.data?.user;
-  const role = formatRole(session.data?.membership?.role ?? user?.role);
+  const role = formatRole(user.role);
+  const visibleNav = NAV.filter((item) => !item.permission || hasPermission(user.permissions, item.permission));
 
   return (
     <Sidebar collapsible="icon">
@@ -59,7 +59,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {NAV.map(({ href, label, icon: Icon }) => {
+              {visibleNav.map(({ href, label, icon: Icon }) => {
                 const active = pathname === href || pathname.startsWith(`${href}/`);
                 return (
                   <SidebarMenuItem key={href}>
@@ -86,23 +86,14 @@ export function AppSidebar() {
             className="flex size-9 shrink-0 items-center justify-center rounded-lg group-data-[collapsible=icon]:size-8 bg-secondary-container text-xs font-semibold text-secondary-container-foreground"
             aria-hidden
           >
-            {session.isPending ? <Skeleton className="size-full rounded-lg" /> : getInitials(user?.name)}
+            {getInitials(user.name)}
           </div>
 
           <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
-            {session.isPending ? (
-              <div className="space-y-1.5">
-                <Skeleton className="h-3.5 w-24" />
-                <Skeleton className="h-3 w-16" />
-              </div>
-            ) : (
-              <>
-                <p className="truncate text-sm font-medium" title={user?.name}>
-                  {user?.name ?? "Unknown user"}
-                </p>
-                <p className="truncate text-xs text-muted-foreground">{role}</p>
-              </>
-            )}
+            <p className="truncate text-sm font-medium" title={user.name}>
+              {user.name || "Unknown user"}
+            </p>
+            <p className="truncate text-xs text-muted-foreground">{role}</p>
           </div>
 
           <Tooltip>

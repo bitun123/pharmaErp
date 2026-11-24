@@ -7,7 +7,6 @@ interface AuthSessionUserInput {
   email: string;
   emailVerified: boolean;
   image?: string | null;
-  role?: string | null;
 }
 
 interface AuthSessionDetailsInput {
@@ -39,7 +38,8 @@ export const createAuthSessionResponse = ({
       email: user.email,
       emailVerified: user.emailVerified,
       image: user.image ?? null,
-      role: user.role ?? undefined,
+      // The role always comes from the membership.
+      role: membership?.role ?? undefined,
     },
 
     session: {

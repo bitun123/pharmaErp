@@ -1,3 +1,5 @@
+import type { PermissionMap } from "@/lib/permissions";
+
 /** "Alex Morgan" -> "AM"; falls back to "?" for empty or missing names. */
 export function getInitials(name?: string | null) {
   const parts = (name ?? "").replace(/^Dr\.?\s+/i, "").trim().split(/\s+/).filter(Boolean);
@@ -11,3 +13,16 @@ export function formatRole(role?: string | null) {
   if (!clean) return "Member";
   return clean.replace(/\b\w/g, (c) => c.toUpperCase());
 }
+
+/** dr.smith@pharma.com -> d***@pharma.com */
+export function maskEmail(email: string) {
+  const [name = "", domain = ""] = email.split("@");
+  return `${name.slice(0, 1)}***@${domain}`;
+}
+
+/** The signed-in user as handed from the server to client components. */
+export type CurrentUser = {
+  name: string;
+  role: string | null;
+  permissions: PermissionMap;
+};

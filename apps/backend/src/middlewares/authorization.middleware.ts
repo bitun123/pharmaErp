@@ -13,7 +13,7 @@ export const authorize = (requiredPermission: Permission) => {
       return next(new AppError("UNAUTHORIZED", "Authentication required.", 401));
     }
 
-    if (!req.user.membershipId && req.user.role !== "SUPER_ADMIN") {
+    if (!req.user.membershipId) {
       return next(
         new AppError("NO_MEMBERSHIP", "No membership found for this account.", 403),
       );

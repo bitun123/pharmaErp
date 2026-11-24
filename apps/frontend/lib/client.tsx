@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+// Always same-origin: next.config.ts rewrites /api/* to the backend, so requests carry this site's session cookie.
 
 export class ApiError extends Error {
   constructor(
@@ -21,7 +21,7 @@ async function request<T>(
 ): Promise<T> {
   const { params, ...fetchOptions } = options;
 
-  const url = new URL(`${BASE_URL}${endpoint}`);
+  const url = new URL(endpoint, window.location.origin);
 
   if (params) {
     Object.entries(params).forEach(([key, value]) => {

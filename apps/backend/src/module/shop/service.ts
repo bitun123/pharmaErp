@@ -16,6 +16,7 @@ import type {
   ListShopsQuery,
   SetAdminPasswordInput,
 } from "@repo/contracts";
+import { logger } from "../../config/logger.js";
 
 /** Converts a shop name into a clean, URL-safe slug. */
 export const slugify = (text: string): string => {
@@ -42,7 +43,6 @@ const adminSelect = {
   id: true,
   name: true,
   email: true,
-  role: true,
   phoneNumber: true,
   image: true,
 } as const;
@@ -114,7 +114,7 @@ export const getAvailableSlug = async (
     }
   } catch (error) {
     if (error instanceof AppError) throw error;
-    console.error("getAvailableSlug failed:", error);
+    logger.error({ err: error }, "getAvailableSlug failed");
     throw new AppError("SLUG_GENERATION_FAILED", "Failed to generate a unique slug.", 500);
   }
 };
@@ -138,14 +138,14 @@ export const createShopService = async (input: CreateShopInput) => {
       select: {
         id: true,
         name: true,
-        role: true,
+        membership: { select: { role: true } },
         shop: { select: { name: true } },
         accounts: { where: { providerId: "credential" }, select: { id: true } },
       },
     });
 
     if (existingUser) {
-      if (existingUser.role === "SUPER_ADMIN") {
+      if (existingUser.membership?.role === "SUPER_ADMIN") {
         throw new AppError(
           "ADMIN_IS_SUPER_ADMIN",
           "This email belongs to a Super Administrator and cannot be assigned as a shop admin.",
@@ -195,11 +195,11 @@ export const createShopService = async (input: CreateShopInput) => {
       const adminUser = existingUser
         ? await tx.user.update({
           where: { id: existingUser.id },
-          data: { role: "ADMIN", emailVerified: true },
+          data: { emailVerified: true, twoFactorEnabled: true },
           select: { id: true },
         })
         : await tx.user.create({
-          data: { name: adminName, email: normalizedEmail, role: "ADMIN", emailVerified: true },
+          data: { name: adminName, email: normalizedEmail, emailVerified: true, twoFactorEnabled: true },
           select: { id: true },
         });
 
@@ -258,7 +258,7 @@ export const createShopService = async (input: CreateShopInput) => {
         password: hashedPassword ? rawPassword : undefined,
         setupUrl,
       })
-    ).catch((err) => console.error("sendShopAdminWelcomeEmail failed:", err));
+    ).catch((err) => logger.error({ err }, "sendShopAdminWelcomeEmail failed"));
 
     return {
       ...shop,
@@ -283,7 +283,7 @@ export const createShopService = async (input: CreateShopInput) => {
     if (isUniqueViolation(error, "email")) {
       throw new AppError("EMAIL_ALREADY_EXISTS", "A user with this email already exists. Please retry.", 409);
     }
-    console.error("createShopService failed:", error);
+    logger.error({ err: error }, "createShopService failed");
     throw new AppError("SHOP_CREATE_FAILED", "Failed to create the shop. Please try again.", 500);
   }
 };
@@ -364,7 +364,7 @@ export const setAdminPasswordService = async (input: SetAdminPasswordInput) => {
     };
   } catch (error) {
     if (error instanceof AppError) throw error;
-    console.error("setAdminPasswordService failed:", error);
+    logger.error({ err: error }, "setAdminPasswordService failed");
     throw new AppError(
       "SET_ADMIN_PASSWORD_FAILED",
       "Failed to set the admin password. Please try again.",
@@ -438,7 +438,7 @@ export const listShopsService = async (query: ListShopsQuery) => {
     };
   } catch (error) {
     if (error instanceof AppError) throw error;
-    console.error("listShopsService failed:", error);
+    logger.error({ err: error }, "listShopsService failed");
     throw new AppError(
       "SHOP_LIST_FAILED",
       "Failed to fetch shops. Please try again.",
@@ -477,7 +477,7 @@ export const getShopByIdService = async (idOrSlug: string) => {
     return shop;
   } catch (error) {
     if (error instanceof AppError) throw error;
-    console.error("getShopByIdService failed:", error);
+    logger.error({ err: error }, "getShopByIdService failed");
     throw new AppError(
       "SHOP_FETCH_FAILED",
       "Failed to fetch the shop. Please try again.",
@@ -542,7 +542,7 @@ export const updateShopService = async (
     if (input.adminId && input.adminId !== currentAdminId) {
       const newAdmin = await prisma.user.findUnique({
         where: { id: input.adminId },
-        select: { id: true, name: true, role: true },
+        select: { id: true, name: true, membership: { select: { role: true } } },
       });
 
       if (!newAdmin) {
@@ -553,7 +553,7 @@ export const updateShopService = async (
         );
       }
 
-      if (newAdmin.role === "SUPER_ADMIN") {
+      if (newAdmin.membership?.role === "SUPER_ADMIN") {
         throw new AppError(
           "ADMIN_IS_SUPER_ADMIN",
           "A Super Administrator cannot be assigned as a shop admin.",
@@ -619,7 +619,6 @@ export const updateShopService = async (
           });
         }
         await createMembershipForUser(finalAdminId, "ADMIN", updated.id, tx);
-        await tx.user.update({ where: { id: finalAdminId }, data: { role: "ADMIN" } });
       }
 
       // Blocking a shop signs everyone in it out right away.
@@ -645,7 +644,7 @@ export const updateShopService = async (
     if (isUniqueViolation(error, "logoFileId")) {
       throw new AppError("LOGO_ALREADY_IN_USE", "This image is already the logo of another shop.", 409);
     }
-    console.error("updateShopService failed:", error);
+    logger.error({ err: error }, "updateShopService failed");
     throw new AppError(
       "SHOP_UPDATE_FAILED",
       "Failed to update the shop. Please try again.",
@@ -706,7 +705,7 @@ export const deleteShopService = async (shopId: string) => {
     };
   } catch (error) {
     if (error instanceof AppError) throw error;
-    console.error("deleteShopService failed:", error);
+    logger.error({ err: error }, "deleteShopService failed");
     throw new AppError(
       "SHOP_DELETE_FAILED",
       "Failed to delete the shop. Please try again.",
