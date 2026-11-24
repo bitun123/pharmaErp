@@ -3,6 +3,35 @@ import path from "node:path";
 import { getImageKit, getImageKitConfig } from "../config/imagekit.js";
 import { AppError } from "../error/app-error.js";
 
+/**
+ * The only ImageKit folders this API will write to, read from or delete in.
+ * Anything else in the ImageKit account (other apps' assets) stays untouchable.
+ */
+export const MANAGED_FOLDERS = ["/shops/logos", "/users/avatars", "/general"] as const;
+
+/** Uploaded but not yet attached to a record. A cleanup script removes stale ones. */
+export const PENDING_TAG = "pending";
+
+const FILE_ID_REGEX = /^[A-Za-z0-9]{8,64}$/;
+const MAX_TAGS = 10;
+const MAX_TAG_LENGTH = 40;
+
+export const isValidFileId = (value: unknown): value is string =>
+  typeof value === "string" && FILE_ID_REGEX.test(value.trim());
+
+export const isManagedPath = (filePath: string): boolean =>
+  MANAGED_FOLDERS.some((folder) => filePath === folder || filePath.startsWith(`${folder}/`));
+
+/** Keeps tags short, unique and free of anything that could spoof our internal tag. */
+export const sanitizeTags = (tags: unknown): string[] => {
+  const list = Array.isArray(tags) ? tags : [];
+  const clean = list
+    .filter((t): t is string => typeof t === "string")
+    .map((t) => t.trim().toLowerCase().replace(/[^a-z0-9:_-]/g, "-").slice(0, MAX_TAG_LENGTH))
+    .filter((t) => t && t !== PENDING_TAG);
+  return [...new Set(clean)].slice(0, MAX_TAGS);
+};
+
 export interface UploadImageInput {
   /**
    * File data as Buffer, base64 data URI string, or external image URL.
@@ -133,6 +162,13 @@ export const uploadImage = async (
   }
 
   const sanitizedFolder = sanitizeFolder(folder);
+  if (!isManagedPath(sanitizedFolder)) {
+    throw new AppError(
+      "INVALID_FOLDER",
+      `Folder '${sanitizedFolder}' is not allowed. Use one of: ${MANAGED_FOLDERS.join(", ")}.`,
+      400
+    );
+  }
   const safeFileName = sanitizeFileName(fileName || "upload.png");
 
   const imagekit = getImageKit();
@@ -142,7 +178,7 @@ export const uploadImage = async (
       file,
       fileName: safeFileName,
       folder: sanitizedFolder,
-      tags,
+      tags: [...sanitizeTags(tags), PENDING_TAG],
       isPrivateFile,
       useUniqueFileName: false, // We already guarantee unique safe names
     });
@@ -177,6 +213,9 @@ export const deleteImage = async (fileId: string): Promise<{ success: boolean; f
 
   const cleanFileId = fileId.trim();
   const imagekit = getImageKit();
+
+  // Only files inside our managed folders may be deleted through the API.
+  await getManagedFileDetails(cleanFileId);
 
   try {
     await imagekit.deleteFile(cleanFileId);
@@ -258,12 +297,76 @@ export const generateImageUrl = (options: GenerateImageUrlInput): string => {
 };
 
 /**
- * Generates client-side authentication parameters for direct frontend uploads.
- * This keeps the privateKey secure on the backend while allowing large file direct uploads.
+ * Fetches a file's details and refuses anything outside our managed folders,
+ * so callers can never read or delete unrelated files in the ImageKit account.
  */
-export const getClientAuthParameters = (token?: string, expire?: number) => {
+export const getManagedFileDetails = async (fileId: string) => {
+  if (!isValidFileId(fileId)) {
+    throw new AppError("INVALID_FILE_ID", "A valid ImageKit file ID is required.", 400);
+  }
+  const details = await getImageDetails(fileId);
+  if (!isManagedPath(details.filePath)) {
+    // Same answer as "not found" so file ids outside our folders are not confirmable.
+    throw new AppError("FILE_NOT_FOUND", `File with ID '${fileId.trim()}' was not found.`, 404);
+  }
+  return details;
+};
+
+/** Removes the "pending" tag once a file is attached to a record, so cleanup skips it. */
+export const markFileAttached = async (fileId: string, tags?: string[] | null): Promise<void> => {
+  try {
+    const next = (tags ?? []).filter((t) => t !== PENDING_TAG);
+    if (next.length === (tags ?? []).length) return; // nothing to change
+    await getImageKit().updateFileDetails(fileId, { tags: next });
+  } catch (error) {
+    // Not fatal: the record is saved; the file just stays tagged and the cleanup script re-checks it.
+    console.error("[ImageKit markFileAttached Error]:", error);
+  }
+};
+
+/**
+ * Best-effort delete for cleanup paths (logo replaced, shop removed).
+ * Never throws: the database change that triggered it must not fail because ImageKit did.
+ */
+export const safeDeleteFile = async (fileId: string | null | undefined): Promise<void> => {
+  if (!fileId || !isValidFileId(fileId)) return;
+  try {
+    ensureImageKitConfigured();
+    await getImageKit().deleteFile(fileId.trim());
+  } catch (error: any) {
+    if (error?.status === 404 || error?.message?.toLowerCase().includes("not found")) return;
+    console.error("[ImageKit safeDeleteFile Error]:", error);
+  }
+};
+
+/** Files still tagged "pending" and older than `olderThanMs`. Used by the cleanup script. */
+export const listStalePendingUploads = async (olderThanMs: number) => {
+  ensureImageKitConfigured();
+  const imagekit = getImageKit();
+  const cutoff = Date.now() - olderThanMs;
+  const stale: Array<{ fileId: string; filePath: string; createdAt: string }> = [];
+
+  for (let skip = 0; ; skip += 100) {
+    const page = await imagekit.listFiles({ tags: PENDING_TAG, fileType: "image", limit: 100, skip });
+    for (const file of page as any[]) {
+      if (isManagedPath(file.filePath) && new Date(file.createdAt).getTime() < cutoff) {
+        stale.push({ fileId: file.fileId, filePath: file.filePath, createdAt: file.createdAt });
+      }
+    }
+    if (page.length < 100) break;
+  }
+  return stale;
+};
+
+/**
+ * Generates client-side authentication parameters for direct frontend uploads.
+ * The token is short-lived. NOTE: direct uploads bypass this server's file checks,
+ * so restrict allowed types/size in the ImageKit dashboard too.
+ */
+export const getClientAuthParameters = () => {
   ensureImageKitConfigured();
 
   const imagekit = getImageKit();
-  return imagekit.getAuthenticationParameters(token, expire);
+  const expire = Math.floor(Date.now() / 1000) + 5 * 60;
+  return imagekit.getAuthenticationParameters(undefined, expire);
 };

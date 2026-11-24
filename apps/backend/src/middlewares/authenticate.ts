@@ -5,6 +5,7 @@ import { prisma } from "../module/auth/config/database.js";
 import { resolveEffectivePermissions, type PermissionMap } from "../module/auth/service/membership.service.js";
 import { AppError } from "../error/app-error.js";
 import { isRoleKey } from "../config/permissions.js";
+import { getShopAccessError } from "../module/shop/shop-access.service.js";
 import type { PlatformRole } from "../generated/prisma/enums.js";
 
 declare global {
@@ -47,8 +48,20 @@ export const authenticate = async (
 
     const membership = await prisma.membership.findUnique({
       where: { userId: session.user.id },
-      select: { id: true, shopId: true, permissions: true },
+      select: {
+        id: true,
+        shopId: true,
+        permissions: true,
+        shop: { select: { isActive: true, deletedAt: true } },
+      },
     });
+
+    // A blocked or deleted shop locks out its admin and staff immediately,
+    // even if they still hold a valid session. Super admins are never tied to a shop.
+    if (role !== "SUPER_ADMIN") {
+      const shopError = getShopAccessError(membership?.shop);
+      if (shopError) throw shopError;
+    }
 
     req.user = {
       id: session.user.id,

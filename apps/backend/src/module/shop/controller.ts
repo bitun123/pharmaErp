@@ -27,6 +27,8 @@ export const createShopController = async (
     const validatedData = createShopSchema.parse(req.body);
     const shop = await createShopService(validatedData);
 
+    // The response carries a one-time password-setup token: never let it be cached.
+    res.setHeader("Cache-Control", "no-store");
     res.status(201).json({
       success: true,
       message: "Shop and Administrator account created successfully.",

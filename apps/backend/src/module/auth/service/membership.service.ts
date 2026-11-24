@@ -40,16 +40,17 @@ export const hasPermission = (
 
 /**
  * Effective permissions for a user. The membership is the source of truth.
- * Safety net: a SUPER_ADMIN whose stored permissions are empty falls back to
- * the role template, so a stale row can never lock out the whole platform.
+ * A SUPER_ADMIN always gets at least the full role template on top of whatever is
+ * stored. That keeps a stale row from locking out the platform, and means newly
+ * added permissions (e.g. media:*) reach existing super admins without a backfill.
  */
 export const resolveEffectivePermissions = (
   role: string | null | undefined,
   rawPermissions: unknown,
 ): PermissionMap => {
   const stored = normalizePermissions(rawPermissions);
-  if (Object.keys(stored).length === 0 && role === "SUPER_ADMIN") {
-    return buildPermissions("SUPER_ADMIN");
+  if (role === "SUPER_ADMIN") {
+    return { ...stored, ...buildPermissions("SUPER_ADMIN") };
   }
   return stored;
 };

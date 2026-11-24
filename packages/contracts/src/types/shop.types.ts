@@ -35,12 +35,15 @@ export interface Shop {
   name: string;
   slug: string;
   logo: string | null;
+  logoFileId: string | null;
   address: string | null;
-  adminId: string;
+  /** Null only for soft-deleted shops, which never appear in API responses. */
+  adminId: string | null;
   isActive: boolean;
   createdAt: Date | string;
   updatedAt: Date | string;
   admin?: {
+    id?: string;
     name: string;
     email: string;
     role?: string;
@@ -52,6 +55,21 @@ export interface Shop {
 /**
  * Standard Shop API response envelopes.
  */
+/** Returned once when a shop is created. Contains a secret setup token, so never cache or log it. */
+export interface CreatedShop extends Shop {
+  adminCredentials: {
+    email: string;
+    hasDirectLogin: boolean;
+    setupUrl: string | null;
+  };
+}
+
+export interface CreateShopResponse {
+  success: boolean;
+  message?: string;
+  data: CreatedShop;
+}
+
 export interface ShopResponse {
   success: boolean;
   message?: string;

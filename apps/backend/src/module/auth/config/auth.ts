@@ -4,11 +4,14 @@ import "dotenv/config";
 import { betterAuth } from "better-auth"
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./database.js"
+import { APIError } from "better-auth/api";
 import { emailOTP, customSession } from "better-auth/plugins";
 import { emailtype, sendOTPEmail } from './../service/email.service.js';
 import type { PlatformRole } from "../../../generated/prisma/enums.js";
 import { createAuthSessionResponse } from '../service/auth-session.service.js';
 import { createMembershipForUser, getMembershipForUser } from '../service/membership.service.js';
+import { assertUserShopAccess } from '../../shop/shop-access.service.js';
+import { AppError } from '../../../error/app-error.js';
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -52,6 +55,24 @@ export const auth = betterAuth({
         },
     },
     databaseHooks: {
+        session: {
+            create: {
+                // Blocked or deleted shops cannot start a session at all.
+                before: async (session) => {
+                    try {
+                        await assertUserShopAccess(session.userId);
+                    } catch (error) {
+                        if (error instanceof AppError) {
+                            throw new APIError("FORBIDDEN", {
+                                code: error.code,
+                                message: error.message,
+                            });
+                        }
+                        throw error;
+                    }
+                },
+            },
+        },
         user: {
             create: {
                 after: async (user) => {

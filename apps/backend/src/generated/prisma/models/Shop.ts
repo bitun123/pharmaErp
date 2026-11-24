@@ -31,6 +31,7 @@ export type ShopMinAggregateOutputType = {
   slug: string | null
   logo: string | null
   address: string | null
+  logoFileId: string | null
   adminId: string | null
   isActive: boolean | null
   createdAt: Date | null
@@ -45,6 +46,7 @@ export type ShopMaxAggregateOutputType = {
   slug: string | null
   logo: string | null
   address: string | null
+  logoFileId: string | null
   adminId: string | null
   isActive: boolean | null
   createdAt: Date | null
@@ -59,6 +61,7 @@ export type ShopCountAggregateOutputType = {
   slug: number
   logo: number
   address: number
+  logoFileId: number
   adminId: number
   isActive: number
   createdAt: number
@@ -75,6 +78,7 @@ export type ShopMinAggregateInputType = {
   slug?: true
   logo?: true
   address?: true
+  logoFileId?: true
   adminId?: true
   isActive?: true
   createdAt?: true
@@ -89,6 +93,7 @@ export type ShopMaxAggregateInputType = {
   slug?: true
   logo?: true
   address?: true
+  logoFileId?: true
   adminId?: true
   isActive?: true
   createdAt?: true
@@ -103,6 +108,7 @@ export type ShopCountAggregateInputType = {
   slug?: true
   logo?: true
   address?: true
+  logoFileId?: true
   adminId?: true
   isActive?: true
   createdAt?: true
@@ -190,7 +196,8 @@ export type ShopGroupByOutputType = {
   slug: string
   logo: string | null
   address: string | null
-  adminId: string
+  logoFileId: string | null
+  adminId: string | null
   isActive: boolean
   createdAt: Date
   updatedAt: Date
@@ -225,12 +232,13 @@ export type ShopWhereInput = {
   slug?: Prisma.StringFilter<"Shop"> | string
   logo?: Prisma.StringNullableFilter<"Shop"> | string | null
   address?: Prisma.StringNullableFilter<"Shop"> | string | null
-  adminId?: Prisma.StringFilter<"Shop"> | string
+  logoFileId?: Prisma.StringNullableFilter<"Shop"> | string | null
+  adminId?: Prisma.StringNullableFilter<"Shop"> | string | null
   isActive?: Prisma.BoolFilter<"Shop"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Shop"> | Date | string | null
-  admin?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  admin?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   members?: Prisma.MembershipListRelationFilter
 }
 
@@ -241,7 +249,8 @@ export type ShopOrderByWithRelationInput = {
   slug?: Prisma.SortOrder
   logo?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
-  adminId?: Prisma.SortOrder
+  logoFileId?: Prisma.SortOrderInput | Prisma.SortOrder
+  adminId?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -254,6 +263,7 @@ export type ShopWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   shopCode?: string
   slug?: string
+  logoFileId?: string
   adminId?: string
   AND?: Prisma.ShopWhereInput | Prisma.ShopWhereInput[]
   OR?: Prisma.ShopWhereInput[]
@@ -265,9 +275,9 @@ export type ShopWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Shop"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"Shop"> | Date | string | null
-  admin?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  admin?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   members?: Prisma.MembershipListRelationFilter
-}, "id" | "shopCode" | "slug" | "adminId">
+}, "id" | "shopCode" | "slug" | "logoFileId" | "adminId">
 
 export type ShopOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -276,7 +286,8 @@ export type ShopOrderByWithAggregationInput = {
   slug?: Prisma.SortOrder
   logo?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
-  adminId?: Prisma.SortOrder
+  logoFileId?: Prisma.SortOrderInput | Prisma.SortOrder
+  adminId?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -296,7 +307,8 @@ export type ShopScalarWhereWithAggregatesInput = {
   slug?: Prisma.StringWithAggregatesFilter<"Shop"> | string
   logo?: Prisma.StringNullableWithAggregatesFilter<"Shop"> | string | null
   address?: Prisma.StringNullableWithAggregatesFilter<"Shop"> | string | null
-  adminId?: Prisma.StringWithAggregatesFilter<"Shop"> | string
+  logoFileId?: Prisma.StringNullableWithAggregatesFilter<"Shop"> | string | null
+  adminId?: Prisma.StringNullableWithAggregatesFilter<"Shop"> | string | null
   isActive?: Prisma.BoolWithAggregatesFilter<"Shop"> | boolean
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Shop"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Shop"> | Date | string
@@ -310,11 +322,12 @@ export type ShopCreateInput = {
   slug: string
   logo?: string | null
   address?: string | null
+  logoFileId?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  admin: Prisma.UserCreateNestedOneWithoutShopInput
+  admin?: Prisma.UserCreateNestedOneWithoutShopInput
   members?: Prisma.MembershipCreateNestedManyWithoutShopInput
 }
 
@@ -325,7 +338,8 @@ export type ShopUncheckedCreateInput = {
   slug: string
   logo?: string | null
   address?: string | null
-  adminId: string
+  logoFileId?: string | null
+  adminId?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -340,11 +354,12 @@ export type ShopUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  admin?: Prisma.UserUpdateOneRequiredWithoutShopNestedInput
+  admin?: Prisma.UserUpdateOneWithoutShopNestedInput
   members?: Prisma.MembershipUpdateManyWithoutShopNestedInput
 }
 
@@ -355,7 +370,8 @@ export type ShopUncheckedUpdateInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  adminId?: Prisma.StringFieldUpdateOperationsInput | string
+  logoFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -370,7 +386,8 @@ export type ShopCreateManyInput = {
   slug: string
   logo?: string | null
   address?: string | null
-  adminId: string
+  logoFileId?: string | null
+  adminId?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -384,6 +401,7 @@ export type ShopUpdateManyMutationInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -397,7 +415,8 @@ export type ShopUncheckedUpdateManyInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  adminId?: Prisma.StringFieldUpdateOperationsInput | string
+  logoFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -416,6 +435,7 @@ export type ShopCountOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   logo?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  logoFileId?: Prisma.SortOrder
   adminId?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -430,6 +450,7 @@ export type ShopMaxOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   logo?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  logoFileId?: Prisma.SortOrder
   adminId?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -444,6 +465,7 @@ export type ShopMinOrderByAggregateInput = {
   slug?: Prisma.SortOrder
   logo?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  logoFileId?: Prisma.SortOrder
   adminId?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -506,6 +528,7 @@ export type ShopCreateWithoutAdminInput = {
   slug: string
   logo?: string | null
   address?: string | null
+  logoFileId?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -520,6 +543,7 @@ export type ShopUncheckedCreateWithoutAdminInput = {
   slug: string
   logo?: string | null
   address?: string | null
+  logoFileId?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -550,6 +574,7 @@ export type ShopUpdateWithoutAdminInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -564,6 +589,7 @@ export type ShopUncheckedUpdateWithoutAdminInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -578,11 +604,12 @@ export type ShopCreateWithoutMembersInput = {
   slug: string
   logo?: string | null
   address?: string | null
+  logoFileId?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  admin: Prisma.UserCreateNestedOneWithoutShopInput
+  admin?: Prisma.UserCreateNestedOneWithoutShopInput
 }
 
 export type ShopUncheckedCreateWithoutMembersInput = {
@@ -592,7 +619,8 @@ export type ShopUncheckedCreateWithoutMembersInput = {
   slug: string
   logo?: string | null
   address?: string | null
-  adminId: string
+  logoFileId?: string | null
+  adminId?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -622,11 +650,12 @@ export type ShopUpdateWithoutMembersInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logoFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  admin?: Prisma.UserUpdateOneRequiredWithoutShopNestedInput
+  admin?: Prisma.UserUpdateOneWithoutShopNestedInput
 }
 
 export type ShopUncheckedUpdateWithoutMembersInput = {
@@ -636,7 +665,8 @@ export type ShopUncheckedUpdateWithoutMembersInput = {
   slug?: Prisma.StringFieldUpdateOperationsInput | string
   logo?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  adminId?: Prisma.StringFieldUpdateOperationsInput | string
+  logoFileId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -681,12 +711,13 @@ export type ShopSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   slug?: boolean
   logo?: boolean
   address?: boolean
+  logoFileId?: boolean
   adminId?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
-  admin?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  admin?: boolean | Prisma.Shop$adminArgs<ExtArgs>
   members?: boolean | Prisma.Shop$membersArgs<ExtArgs>
   _count?: boolean | Prisma.ShopCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["shop"]>
@@ -698,12 +729,13 @@ export type ShopSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   slug?: boolean
   logo?: boolean
   address?: boolean
+  logoFileId?: boolean
   adminId?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
-  admin?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  admin?: boolean | Prisma.Shop$adminArgs<ExtArgs>
 }, ExtArgs["result"]["shop"]>
 
 export type ShopSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -713,12 +745,13 @@ export type ShopSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   slug?: boolean
   logo?: boolean
   address?: boolean
+  logoFileId?: boolean
   adminId?: boolean
   isActive?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
-  admin?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  admin?: boolean | Prisma.Shop$adminArgs<ExtArgs>
 }, ExtArgs["result"]["shop"]>
 
 export type ShopSelectScalar = {
@@ -728,6 +761,7 @@ export type ShopSelectScalar = {
   slug?: boolean
   logo?: boolean
   address?: boolean
+  logoFileId?: boolean
   adminId?: boolean
   isActive?: boolean
   createdAt?: boolean
@@ -735,23 +769,23 @@ export type ShopSelectScalar = {
   deletedAt?: boolean
 }
 
-export type ShopOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "shopCode" | "name" | "slug" | "logo" | "address" | "adminId" | "isActive" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["shop"]>
+export type ShopOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "shopCode" | "name" | "slug" | "logo" | "address" | "logoFileId" | "adminId" | "isActive" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["shop"]>
 export type ShopInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  admin?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  admin?: boolean | Prisma.Shop$adminArgs<ExtArgs>
   members?: boolean | Prisma.Shop$membersArgs<ExtArgs>
   _count?: boolean | Prisma.ShopCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ShopIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  admin?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  admin?: boolean | Prisma.Shop$adminArgs<ExtArgs>
 }
 export type ShopIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  admin?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  admin?: boolean | Prisma.Shop$adminArgs<ExtArgs>
 }
 
 export type $ShopPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Shop"
   objects: {
-    admin: Prisma.$UserPayload<ExtArgs>
+    admin: Prisma.$UserPayload<ExtArgs> | null
     members: Prisma.$MembershipPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -761,7 +795,8 @@ export type $ShopPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     slug: string
     logo: string | null
     address: string | null
-    adminId: string
+    logoFileId: string | null
+    adminId: string | null
     isActive: boolean
     createdAt: Date
     updatedAt: Date
@@ -1160,7 +1195,7 @@ readonly fields: ShopFieldRefs;
  */
 export interface Prisma__ShopClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  admin<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  admin<T extends Prisma.Shop$adminArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Shop$adminArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   members<T extends Prisma.Shop$membersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Shop$membersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1197,6 +1232,7 @@ export interface ShopFieldRefs {
   readonly slug: Prisma.FieldRef<"Shop", 'String'>
   readonly logo: Prisma.FieldRef<"Shop", 'String'>
   readonly address: Prisma.FieldRef<"Shop", 'String'>
+  readonly logoFileId: Prisma.FieldRef<"Shop", 'String'>
   readonly adminId: Prisma.FieldRef<"Shop", 'String'>
   readonly isActive: Prisma.FieldRef<"Shop", 'Boolean'>
   readonly createdAt: Prisma.FieldRef<"Shop", 'DateTime'>
@@ -1600,6 +1636,25 @@ export type ShopDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Limit how many Shops to delete.
    */
   limit?: number
+}
+
+/**
+ * Shop.admin
+ */
+export type Shop$adminArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
 }
 
 /**

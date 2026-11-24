@@ -988,6 +988,7 @@ export const ShopScalarFieldEnum = {
   slug: 'slug',
   logo: 'logo',
   address: 'address',
+  logoFileId: 'logoFileId',
   adminId: 'adminId',
   isActive: 'isActive',
   createdAt: 'createdAt',

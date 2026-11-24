@@ -2,10 +2,12 @@ import type { Request, Response, NextFunction } from "express";
 import {
   uploadImage,
   deleteImage,
-  getImageDetails,
+  getManagedFileDetails,
   getClientAuthParameters,
+  isValidFileId,
 } from "../../services/imagekit.service.js";
 import { AppError } from "../../error/app-error.js";
+import { prisma } from "../auth/config/database.js";
 
 /**
  * Controller to upload an image to ImageKit.
@@ -26,10 +28,10 @@ export const uploadImageController = async (
       );
     }
 
-    const folder = typeof req.body.folder === "string" ? req.body.folder : undefined;
-    const tags = Array.isArray(req.body.tags)
+    const folder = typeof req.body?.folder === "string" ? req.body.folder : undefined;
+    const tags = Array.isArray(req.body?.tags)
       ? req.body.tags
-      : typeof req.body.tags === "string"
+      : typeof req.body?.tags === "string"
       ? req.body.tags.split(",").map((t: string) => t.trim()).filter(Boolean)
       : [];
 
@@ -61,11 +63,24 @@ export const deleteImageController = async (
   try {
     const { fileId } = req.params;
 
-    if (!fileId || typeof fileId !== "string" || !fileId.trim()) {
+    if (!isValidFileId(fileId)) {
       throw new AppError(
         "INVALID_FILE_ID",
         "A valid file ID parameter is required.",
         400
+      );
+    }
+
+    // A file that is a shop's logo must be removed by changing the shop, not directly.
+    const inUse = await prisma.shop.findFirst({
+      where: { logoFileId: fileId.trim() },
+      select: { name: true },
+    });
+    if (inUse) {
+      throw new AppError(
+        "FILE_IN_USE",
+        `This image is the logo of '${inUse.name}'. Change or remove the shop logo instead.`,
+        409
       );
     }
 
@@ -92,7 +107,7 @@ export const getImageDetailsController = async (
   try {
     const { fileId } = req.params;
 
-    if (!fileId || typeof fileId !== "string" || !fileId.trim()) {
+    if (!isValidFileId(fileId)) {
       throw new AppError(
         "INVALID_FILE_ID",
         "A valid file ID parameter is required.",
@@ -100,7 +115,7 @@ export const getImageDetailsController = async (
       );
     }
 
-    const details = await getImageDetails(fileId);
+    const details = await getManagedFileDetails(fileId);
 
     res.status(200).json({
       success: true,

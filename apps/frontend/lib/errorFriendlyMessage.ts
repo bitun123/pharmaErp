@@ -13,6 +13,8 @@ const MESSAGES: Record<string, string> = {
   PASSWORD_TOO_LONG: "Password must not exceed 128 characters.",
   INVALID_OTP: "Invalid verification code.",
   OTP_EXPIRED: "This verification code has expired. Request a new one.",
+  SHOP_BLOCKED: "Your shop has been blocked. Please contact your administrator.",
+  SHOP_DELETED: "Your shop has been removed. Please contact your administrator.",
   TOO_MANY_ATTEMPTS: "Too many incorrect attempts. Request a new code.",
 };
 

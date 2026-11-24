@@ -12,6 +12,14 @@ const TONES: Record<DashboardStat["tone"], string> = {
   approval: "bg-approval/15 text-approval",
 };
 
+// 1px outer border, transparent until hover, then in the icon's color.
+const CARD_BORDERS: Record<DashboardStat["tone"], string> = {
+  team: "hover:border-team",
+  attendance: "hover:border-attendance",
+  danger: "hover:border-danger",
+  approval: "hover:border-approval",
+};
+
 export function StatCards() {
   return (
     <section aria-label="Overview" className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
@@ -20,7 +28,7 @@ export function StatCards() {
         return (
           <div
             key={stat.key}
-            className="rounded-xl bg-card p-4 shadow-[0_1px_3px_rgba(15,23,42,0.06),0_6px_20px_rgba(15,23,42,0.07)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.5),0_6px_20px_rgba(0,0,0,0.35)] transition-shadow hover:shadow-[0_2px_6px_rgba(15,23,42,0.08),0_10px_28px_rgba(15,23,42,0.1)]"
+            className={cn("cursor-pointer rounded-xl border border-transparent bg-card p-4 shadow-[0_1px_3px_rgba(15,23,42,0.06),0_6px_20px_rgba(15,23,42,0.07)] dark:shadow-[0_1px_3px_rgba(0,0,0,0.5),0_6px_20px_rgba(0,0,0,0.35)] transition-[border-color,box-shadow] duration-200 hover:shadow-[0_2px_6px_rgba(15,23,42,0.08),0_10px_28px_rgba(15,23,42,0.1)]", CARD_BORDERS[stat.tone])}
           >
             <div className="flex items-start justify-between gap-3">
               <p className="truncate text-sm text-muted-foreground">{stat.label}</p>

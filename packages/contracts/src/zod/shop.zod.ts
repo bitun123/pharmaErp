@@ -8,6 +8,39 @@ import { z } from "zod";
  */
 export const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
+/** ImageKit file ids are alphanumeric. Mirrors the check in the backend media service. */
+export const FILE_ID_REGEX = /^[A-Za-z0-9]{8,64}$/;
+
+const fileIdField = z
+  .string()
+  .trim()
+  .regex(FILE_ID_REGEX, "Logo file ID is not valid.");
+
+/**
+ * Optional text for CREATE: empty string and null both mean "not provided".
+ */
+const optionalText = (label: string, max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max, `${label} cannot exceed ${max} characters.`)
+    .optional()
+    .nullable()
+    .or(z.literal(""))
+    .transform((val) => (val ? val : undefined));
+
+/**
+ * Optional text for UPDATE: undefined = leave unchanged, "" or null = clear the field.
+ */
+const clearableText = (label: string, max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max, `${label} cannot exceed ${max} characters.`)
+    .nullable()
+    .optional()
+    .transform((val) => (val === undefined ? undefined : val ? val : null));
+
 /**
  * Zod validation schema for creating a new Shop.
  * Mirrors the Prisma `Shop` model and covers all client/server edge cases:
@@ -15,7 +48,7 @@ export const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
  * - Enforces minimum and maximum name bounds
  * - Formats and validates slug (lowercase, URL-safe)
  * - Sanitizes optional fields (empty string converted to undefined)
- * - Validates logo URL format
+ * - Accepts the logo as an uploaded ImageKit file id (the URL is resolved server-side)
  */
 export const createShopSchema = z.object({
   name: z
@@ -38,24 +71,11 @@ export const createShopSchema = z.object({
     )
     .optional(),
 
-  logo: z
-    .string()
-    .trim()
-    .url("Logo must be a valid URL.")
-    .max(500, "Logo URL cannot exceed 500 characters.")
-    .optional()
-    .nullable()
-    .or(z.literal(""))
-    .transform((val) => (val ? val : undefined)),
+  // The logo is uploaded first (POST /api/media/upload, folder "shops/logos").
+  // Send the returned fileId; the server resolves the URL itself.
+  logoFileId: fileIdField.optional().nullable().or(z.literal("")).transform((val) => (val ? val : undefined)),
 
-  address: z
-    .string()
-    .trim()
-    .max(300, "Address cannot exceed 300 characters.")
-    .optional()
-    .nullable()
-    .or(z.literal(""))
-    .transform((val) => (val ? val : undefined)),
+  address: optionalText("Address", 300),
 
   adminName: z
     .string({
@@ -87,13 +107,27 @@ export const createShopSchema = z.object({
 
 /**
  * Zod validation schema for updating an existing Shop.
- * Allows updating any subset of the shop fields.
+ * Any subset of fields may be sent. For `address` and `logoFileId`, null (or "")
+ * clears the value and omitting the key leaves it unchanged.
  */
-export const updateShopSchema = createShopSchema.partial().extend({
-  // Only used when reassigning the shop to a different existing admin.
-  // Not part of create: the admin is created together with the shop.
-  adminId: z.string().trim().min(1, "Admin ID cannot be empty.").optional(),
-});
+export const updateShopSchema = z
+  .object({
+    name: createShopSchema.shape.name.optional(),
+    slug: createShopSchema.shape.slug,
+    address: clearableText("Address", 300),
+    logoFileId: fileIdField
+      .nullable()
+      .or(z.literal(""))
+      .optional()
+      .transform((val) => (val === undefined ? undefined : val ? val : null)),
+    isActive: z.boolean().optional(),
+    // Only used when reassigning the shop to a different existing admin.
+    // Not part of create: the admin is created together with the shop.
+    adminId: z.string().trim().min(1, "Admin ID cannot be empty.").optional(),
+  })
+  .refine((data) => Object.values(data).some((value) => value !== undefined), {
+    message: "Provide at least one field to update.",
+  });
 
 /**
  * Zod validation schema for an admin setting their password using the invitation/setup link.
@@ -129,7 +163,7 @@ export const listShopsQuerySchema = z.object({
   search: z.string().trim().optional(),
   isActive: z.enum(["true", "false", "all"]).optional(),
   sortBy: z
-    .enum(["createdAt", "updatedAt", "name", "shopCode"])
+    .enum(["createdAt", "updatedAt", "name", "slug", "shopCode", "isActive"])
     .default("createdAt"),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });

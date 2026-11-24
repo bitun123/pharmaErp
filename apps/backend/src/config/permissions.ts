@@ -5,9 +5,20 @@ export const SHOP_PERMISSIONS = {
   DELETE: "shop:delete",
 } as const;
 
-export type Permission = (typeof SHOP_PERMISSIONS)[keyof typeof SHOP_PERMISSIONS];
+export const MEDIA_PERMISSIONS = {
+  UPLOAD: "media:upload",
+  READ: "media:read",
+  DELETE: "media:delete",
+} as const;
 
-export const ALL_PERMISSIONS: readonly Permission[] = Object.values(SHOP_PERMISSIONS);
+export type Permission =
+  | (typeof SHOP_PERMISSIONS)[keyof typeof SHOP_PERMISSIONS]
+  | (typeof MEDIA_PERMISSIONS)[keyof typeof MEDIA_PERMISSIONS];
+
+export const ALL_PERMISSIONS: readonly Permission[] = [
+  ...Object.values(SHOP_PERMISSIONS),
+  ...Object.values(MEDIA_PERMISSIONS),
+];
 
 // Default permission template per role. It only seeds Membership.permissions;
 // authorization reads the membership (see authenticate + authorize middlewares).
@@ -17,6 +28,9 @@ export const SHOP_ROLE_PERMISSIONS = {
     SHOP_PERMISSIONS.READ,
     SHOP_PERMISSIONS.UPDATE,
     SHOP_PERMISSIONS.DELETE,
+    MEDIA_PERMISSIONS.UPLOAD,
+    MEDIA_PERMISSIONS.READ,
+    MEDIA_PERMISSIONS.DELETE,
   ],
 
   ADMIN: [],

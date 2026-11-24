@@ -4,6 +4,11 @@ import { hashPassword } from "better-auth/crypto";
 import { AppError } from "../../error/app-error.js";
 import { sendShopAdminWelcomeEmail } from "../auth/service/email.service.js";
 import { createMembershipForUser } from "../auth/service/membership.service.js";
+import {
+  getManagedFileDetails,
+  markFileAttached,
+  safeDeleteFile,
+} from "../../services/imagekit.service.js";
 import type { Prisma } from "../../generated/prisma/client.js";
 import type {
   CreateShopInput,
@@ -41,6 +46,44 @@ const adminSelect = {
   phoneNumber: true,
   image: true,
 } as const;
+
+/**
+ * Validates an uploaded logo and returns what must be stored for it.
+ * The URL always comes from ImageKit (never from the client), the file must sit in
+ * the shops/logos folder, and one file can only be the logo of one shop.
+ */
+const resolveLogo = async (fileId: string, excludeShopId?: string) => {
+  const used = await prisma.shop.findFirst({
+    where: { logoFileId: fileId, ...(excludeShopId ? { id: { not: excludeShopId } } : {}) },
+    select: { id: true },
+  });
+  if (used) {
+    throw new AppError("LOGO_ALREADY_IN_USE", "This image is already the logo of another shop.", 409);
+  }
+
+  const details = await getManagedFileDetails(fileId);
+  if (!details.filePath.startsWith("/shops/logos/")) {
+    throw new AppError(
+      "INVALID_LOGO_FOLDER",
+      "The logo must be uploaded to the 'shops/logos' folder.",
+      400
+    );
+  }
+  return { logo: details.url, logoFileId: details.fileId, tags: details.tags ?? null };
+};
+
+/** Signs out everyone tied to a shop (its admin and members), e.g. when it is blocked or deleted. */
+const revokeShopSessions = async (
+  tx: Prisma.TransactionClient,
+  shopId: string,
+  adminId: string | null,
+) => {
+  const members = await tx.membership.findMany({ where: { shopId }, select: { userId: true } });
+  const userIds = [...new Set([...members.map((m) => m.userId), ...(adminId ? [adminId] : [])])];
+  if (userIds.length > 0) {
+    await tx.session.deleteMany({ where: { userId: { in: userIds } } });
+  }
+};
 
 /**
  * Finds an available unique slug by appending incremental numeric suffixes if collisions occur.
@@ -137,6 +180,9 @@ export const createShopService = async (input: CreateShopInput) => {
       finalSlug = await getAvailableSlug(slugify(shopName));
     }
 
+    // Validate the logo before anything is written. The URL is taken from ImageKit, not the client.
+    const logoInfo = input.logoFileId ? await resolveLogo(input.logoFileId) : null;
+
     // A credential already on file is never overwritten from here.
     const hasCredential = (existingUser?.accounts.length ?? 0) > 0;
     const needsSetupToken = !rawPassword && !hasCredential;
@@ -183,7 +229,8 @@ export const createShopService = async (input: CreateShopInput) => {
         data: {
           name: shopName,
           slug: finalSlug,
-          logo: input.logo,
+          logo: logoInfo?.logo,
+          logoFileId: logoInfo?.logoFileId,
           address: input.address,
           adminId: adminUser.id,
           isActive: input.isActive ?? true,
@@ -194,7 +241,10 @@ export const createShopService = async (input: CreateShopInput) => {
       await createMembershipForUser(adminUser.id, "ADMIN", created.id, tx);
       return created;
     });
-//testing
+
+    // The logo is now attached to a shop, so the cleanup script must not touch it.
+    if (logoInfo) void markFileAttached(logoInfo.logoFileId, logoInfo.tags);
+
     const setupUrl = setupToken
       ? `${publicWebUrl}/set-password?token=${setupToken}&email=${encodeURIComponent(normalizedEmail)}`
       : undefined;
@@ -226,6 +276,9 @@ export const createShopService = async (input: CreateShopInput) => {
     }
     if (isUniqueViolation(error, "adminId")) {
       throw new AppError("ADMIN_ALREADY_ASSIGNED", "This user is already a shop administrator.", 409);
+    }
+    if (isUniqueViolation(error, "logoFileId")) {
+      throw new AppError("LOGO_ALREADY_IN_USE", "This image is already the logo of another shop.", 409);
     }
     if (isUniqueViolation(error, "email")) {
       throw new AppError("EMAIL_ALREADY_EXISTS", "A user with this email already exists. Please retry.", 409);
@@ -352,7 +405,11 @@ export const listShopsService = async (query: ListShopsQuery) => {
     // Sorting
     const sortBy = SORTABLE_FIELDS.has(String(query.sortBy)) ? String(query.sortBy) : "createdAt";
     const sortOrder = query.sortOrder === "asc" ? "asc" : "desc";
-    const orderBy = { [sortBy]: sortOrder } as Prisma.ShopOrderByWithRelationInput;
+    // `id` as a tiebreaker keeps pagination stable when many rows share the sort value.
+    const orderBy = [
+      { [sortBy]: sortOrder },
+      { id: "asc" },
+    ] as Prisma.ShopOrderByWithRelationInput[];
 
     // Fetch count and records in parallel transaction
     const [total, shops] = await prisma.$transaction([
@@ -362,16 +419,7 @@ export const listShopsService = async (query: ListShopsQuery) => {
         skip,
         take: limit,
         orderBy,
-        include: {
-          admin: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              role: true,
-            },
-          },
-        },
+        include: { admin: { select: adminSelect } },
       }),
     ]);
 
@@ -415,18 +463,7 @@ export const getShopByIdService = async (idOrSlug: string) => {
         deletedAt: null,
         OR: [{ id: cleanIdentifier }, { slug: cleanIdentifier }],
       },
-      include: {
-        admin: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            role: true,
-            phoneNumber: true,
-            image: true,
-          },
-        },
-      },
+      include: { admin: { select: adminSelect } },
     });
 
     if (!shop) {
@@ -500,8 +537,9 @@ export const updateShopService = async (
     }
 
     // 3. Validate adminId if being updated
-    let finalAdminId = existingShop.adminId;
-    if (input.adminId && input.adminId !== existingShop.adminId) {
+    const currentAdminId = existingShop.adminId;
+    let finalAdminId = currentAdminId;
+    if (input.adminId && input.adminId !== currentAdminId) {
       const newAdmin = await prisma.user.findUnique({
         where: { id: input.adminId },
         select: { id: true, name: true, role: true },
@@ -541,15 +579,30 @@ export const updateShopService = async (
       finalAdminId = input.adminId;
     }
 
+    // 3b. Logo: undefined = unchanged, null = remove, string = new ImageKit file id
+    let logoData: { logo?: string | null; logoFileId?: string | null } = {};
+    let newLogoInfo: Awaited<ReturnType<typeof resolveLogo>> | null = null;
+    let logoToDelete: string | null = null;
+    if (input.logoFileId === null) {
+      if (existingShop.logoFileId) logoToDelete = existingShop.logoFileId;
+      logoData = { logo: null, logoFileId: null };
+    } else if (input.logoFileId && input.logoFileId !== existingShop.logoFileId) {
+      newLogoInfo = await resolveLogo(input.logoFileId, existingShop.id);
+      logoData = { logo: newLogoInfo.logo, logoFileId: newLogoInfo.logoFileId };
+      logoToDelete = existingShop.logoFileId;
+    }
+
     // 4. Perform update (shop + admin hand-over in one transaction)
-    const adminChanged = finalAdminId !== existingShop.adminId;
+    const adminChanged = finalAdminId !== currentAdminId;
+    const isBeingBlocked = existingShop.isActive && input.isActive === false;
     const updatedShop = await prisma.$transaction(async (tx) => {
       const updated = await tx.shop.update({
         where: { id: existingShop.id },
         data: {
           name: input.name?.trim() || existingShop.name,
           slug: finalSlug,
-          logo: input.logo !== undefined ? input.logo : existingShop.logo,
+          ...logoData,
+          // undefined = unchanged, null = cleared
           address: input.address !== undefined ? input.address : existingShop.address,
           adminId: finalAdminId,
           isActive: input.isActive !== undefined ? input.isActive : existingShop.isActive,
@@ -558,16 +611,27 @@ export const updateShopService = async (
       });
 
       // Move the shop link and ADMIN role from the old admin to the new one
-      if (adminChanged) {
-        await tx.membership.updateMany({
-          where: { userId: existingShop.adminId, shopId: updated.id },
-          data: { shopId: null },
-        });
+      if (adminChanged && finalAdminId) {
+        if (currentAdminId) {
+          await tx.membership.updateMany({
+            where: { userId: currentAdminId, shopId: updated.id },
+            data: { shopId: null },
+          });
+        }
         await createMembershipForUser(finalAdminId, "ADMIN", updated.id, tx);
         await tx.user.update({ where: { id: finalAdminId }, data: { role: "ADMIN" } });
       }
+
+      // Blocking a shop signs everyone in it out right away.
+      if (isBeingBlocked) {
+        await revokeShopSessions(tx, updated.id, currentAdminId);
+      }
       return updated;
     });
+
+    // ImageKit housekeeping runs after the commit and never fails the request.
+    if (newLogoInfo) void markFileAttached(newLogoInfo.logoFileId, newLogoInfo.tags);
+    if (logoToDelete) void safeDeleteFile(logoToDelete);
 
     return updatedShop;
   } catch (error) {
@@ -577,6 +641,9 @@ export const updateShopService = async (
     }
     if (isUniqueViolation(error, "adminId")) {
       throw new AppError("ADMIN_ALREADY_ASSIGNED", "That user is already a shop administrator.", 409);
+    }
+    if (isUniqueViolation(error, "logoFileId")) {
+      throw new AppError("LOGO_ALREADY_IN_USE", "This image is already the logo of another shop.", 409);
     }
     console.error("updateShopService failed:", error);
     throw new AppError(
@@ -598,7 +665,7 @@ export const deleteShopService = async (shopId: string) => {
 
     const existingShop = await prisma.shop.findFirst({
       where: { id: shopId.trim(), deletedAt: null },
-      select: { id: true, name: true },
+      select: { id: true, name: true, slug: true, adminId: true, logoFileId: true },
     });
 
     if (!existingShop) {
@@ -609,17 +676,28 @@ export const deleteShopService = async (shopId: string) => {
       );
     }
 
-    await prisma.$transaction([
-      prisma.shop.update({
+    await prisma.$transaction(async (tx) => {
+      // Sign everyone out first (needs the member list while it is still intact).
+      await revokeShopSessions(tx, existingShop.id, existingShop.adminId);
+
+      await tx.shop.update({
         where: { id: existingShop.id },
-        data: { deletedAt: new Date(), isActive: false },
-      }),
-      // Members of a deleted shop must not keep access through it
-      prisma.membership.updateMany({
-        where: { shopId: existingShop.id },
-        data: { shopId: null },
-      }),
-    ]);
+        data: {
+          deletedAt: new Date(),
+          isActive: false,
+          // Free the admin, the slug and the logo so they can be used again.
+          // Members keep their shopId on purpose: authenticate() sees the deleted
+          // shop and refuses them, so nobody keeps access through it.
+          adminId: null,
+          slug: `${existingShop.slug}--deleted-${existingShop.id.slice(-8)}`,
+          logo: null,
+          logoFileId: null,
+        },
+      });
+    });
+
+    // The logo file is no longer referenced anywhere. Best effort, after the commit.
+    void safeDeleteFile(existingShop.logoFileId);
 
     return {
       success: true,

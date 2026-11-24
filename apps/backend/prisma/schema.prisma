@@ -117,11 +117,16 @@ model Shop {
 
   name    String
   slug    String  @unique
-  logo    String? // Shop logo URL
+  logo    String? // Shop logo URL (always derived server-side from logoFileId)
   address String?
 
-  adminId String @unique
-  admin   User   @relation(fields: [adminId], references: [id])
+  // ImageKit file id of the logo, so the file can be deleted when the logo is replaced or the shop is removed.
+  logoFileId String? @unique
+
+  // Null once the shop is soft-deleted, which frees the admin to be assigned to another shop.
+  // Postgres allows many NULLs under a unique index.
+  adminId String? @unique
+  admin   User?   @relation(fields: [adminId], references: [id])
 
   members Membership[]
 

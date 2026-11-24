@@ -1,5 +1,7 @@
 import express from "express";
 import { authenticate } from "../../middlewares/authenticate.js";
+import { authorize } from "../../middlewares/authorization.middleware.js";
+import { MEDIA_PERMISSIONS } from "../../config/permissions.js";
 import { singleImageUpload } from "../../middlewares/upload.middleware.js";
 import {
   uploadImageController,
@@ -17,6 +19,7 @@ const mediaRoutes = express.Router();
 mediaRoutes.post(
   "/upload",
   authenticate,
+  authorize(MEDIA_PERMISSIONS.UPLOAD),
   singleImageUpload("image"),
   uploadImageController
 );
@@ -28,6 +31,7 @@ mediaRoutes.post(
 mediaRoutes.delete(
   "/:fileId",
   authenticate,
+  authorize(MEDIA_PERMISSIONS.DELETE),
   deleteImageController
 );
 
@@ -38,6 +42,7 @@ mediaRoutes.delete(
 mediaRoutes.get(
   "/details/:fileId",
   authenticate,
+  authorize(MEDIA_PERMISSIONS.READ),
   getImageDetailsController
 );
 
@@ -48,6 +53,7 @@ mediaRoutes.get(
 mediaRoutes.get(
   "/auth",
   authenticate,
+  authorize(MEDIA_PERMISSIONS.UPLOAD),
   getMediaAuthController
 );
 
