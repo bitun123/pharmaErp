@@ -76,3 +76,15 @@ This file is mandatory. The agent must read and follow these rules before starti
 - Block selling expired medicines or enforce a strict warning.
 - Report data must always come from the database—never use hardcoded values.
 - Strictly enforce user roles (e.g., Admin, Cashier, Pharmacist) so users can only access what they are permitted to do.
+
+## 11. Frontend / Backend Scope Rule
+- **Working on the frontend:** do NOT change anything in the backend (`apps/backend`). Only analyze the backend (read-only) and implement the frontend according to what the backend actually does.
+- **Working on the backend:** do NOT change anything in the frontend (`apps/frontend`).
+- If a task needs a change on the other side, stop and tell the owner what is needed. Do not make that change yourself.
+- Shared code (`packages/contracts`) is the exception only when the owner has approved it in the plan.
+
+## 12. Database Rule - Most Important
+- **Never perform any operation on the database.** Do not change, update, or delete data or structure.
+- This includes: INSERT / UPDATE / DELETE, schema changes (DDL), migrations, `prisma db push`, `prisma db execute`, seed scripts, `psql` or any other database client, and scripts or tests that connect to the database and write to it.
+- Do not run any command that connects to the database to read or write. If database work is needed, give the owner the exact command or SQL and let the owner run it.
+- Editing `schema.prisma` or code files is allowed only after plan approval (rule 4), but applying the change to the database is always done by the owner.

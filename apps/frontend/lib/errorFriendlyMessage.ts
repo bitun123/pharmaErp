@@ -21,6 +21,19 @@ const MESSAGES: Record<string, string> = {
   SHOP_BLOCKED: "Your shop has been blocked. Please contact your administrator.",
   SHOP_DELETED: "Your shop has been removed. Please contact your administrator.",
   TOO_MANY_ATTEMPTS: "Too many incorrect attempts. Request a new code.",
+  // Image upload (backend media module)
+  FILE_TOO_LARGE: "This image is too large. The maximum size is 5 MB.",
+  INVALID_FILE_TYPE: "Only JPEG, PNG, WEBP and GIF images are allowed.",
+  INVALID_FILE_CONTENT: "This file is not a valid image.",
+  EMPTY_FILE: "This file is empty.",
+  NO_FILE_PROVIDED: "Please choose an image to upload.",
+  UNEXPECTED_FIELD: "The image could not be uploaded. Please try again.",
+  INVALID_FOLDER: "The image could not be uploaded. Please try again.",
+  UPLOAD_ERROR: "The image could not be uploaded. Please try again.",
+  IMAGEKIT_UPLOAD_ERROR: "The image could not be uploaded. Please try again.",
+  IMAGEKIT_NOT_CONFIGURED: "Image uploads are not available right now. Please contact support.",
+  FILE_NOT_FOUND: "That image no longer exists.",
+  FILE_IN_USE: "This image is in use and cannot be removed.",
 };
 
 /** Turns anything thrown by the api client into a user-facing message. */
@@ -28,6 +41,7 @@ export function getErrorFriendlyMessage(error: unknown): string {
   if (error instanceof ApiError) {
     if (error.code && MESSAGES[error.code]) return MESSAGES[error.code]!;
     if (error.status === 0) return "Unable to reach the server. Check your connection.";
+    if (error.status === 413) return "This file is too large to upload.";
     if (error.status === 429) return "Too many requests. Please wait a moment and try again.";
     if (error.status === 401) return "Incorrect email or password.";
     if (error.status >= 500) return "Something went wrong on our side. Please try again.";

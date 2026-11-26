@@ -5,6 +5,8 @@ export class ApiError extends Error {
     message: string,
     readonly status: number,
     readonly code?: string,
+    /** The backend's per-field validation errors ([{ field, message }]), when it sent any. */
+    readonly details?: unknown,
   ) {
     super(message);
     this.name = "ApiError";
@@ -29,17 +31,24 @@ async function request<T>(
     });
   }
 
+  // A file upload must NOT set Content-Type itself: the browser adds the multipart boundary.
+  const isFormData = typeof FormData !== "undefined" && fetchOptions.body instanceof FormData;
+
   let response: Response;
   try {
     response = await fetch(url, {
       ...fetchOptions,
       headers: {
-        "Content-Type": "application/json",
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
         ...fetchOptions.headers,
       },
       credentials: "include",
     });
-  } catch {
+  } catch (error) {
+    // A request we cancelled ourselves (e.g. the user picked another file) is not a network failure.
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new ApiError("Request cancelled.", 0, "ABORTED");
+    }
     throw new ApiError("Unable to reach the server.", 0, "NETWORK_ERROR");
   }
 
@@ -50,6 +59,7 @@ async function request<T>(
       data?.message ?? response.statusText ?? "API request failed",
       response.status,
       data?.code,
+      data?.errors,
     );
   }
 
@@ -80,4 +90,8 @@ export const api = {
 
   delete: <T,>(url: string) =>
     request<T>(url, { method: "DELETE" }),
+
+  /** Sends a file (multipart). Pass a signal to be able to cancel it. */
+  upload: <T,>(url: string, body: FormData, options?: { signal?: AbortSignal }) =>
+    request<T>(url, { method: "POST", body, signal: options?.signal }),
 };

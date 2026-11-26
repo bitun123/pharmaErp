@@ -9,5 +9,8 @@ export type PermissionMap = Record<string, boolean | "all">;
 export const hasPermission = (permissions: PermissionMap, required: string): boolean =>
   permissions["*"] === true || permissions[required] === true;
 
+/** The permission that allows registering a new shop. */
+export const SHOP_CREATE_PERMISSION = "shop:create";
+
 /** The permission that opens the Super Admin area. */
 export const SUPER_ADMIN_AREA_PERMISSION = "shop:read";

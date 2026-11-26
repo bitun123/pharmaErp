@@ -1,14 +1,11 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { Plus } from "lucide-react";
 import { AppSidebar } from "@/components/dashboard/app-sidebar";
 import { WelcomeHeading } from "@/components/dashboard/welcome-heading";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { hasPermission } from "@/lib/permissions";
 import type { CurrentUser } from "@/lib/user";
 
 export function DashboardShell({
@@ -31,16 +28,6 @@ export function DashboardShell({
               <WelcomeHeading name={user.name} />
             </div>
             <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-              {hasPermission(user.permissions, "shop:create") && (
-              <Link
-                href="/shops/new"
-                aria-label="Register New Shop"
-                className="inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-primary px-3 text-[13px] font-semibold text-primary-foreground transition-colors hover:bg-primary/90 sm:px-4"
-              >
-                <Plus className="size-4" />
-                <span className="hidden sm:inline">Register New Shop</span>
-              </Link>
-              )}
               <ThemeToggle />
             </div>
           </header>

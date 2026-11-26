@@ -17,6 +17,69 @@ const FILE_ID_REGEX = /^[A-Za-z0-9]{8,64}$/;
 const MAX_TAGS = 10;
 const MAX_TAG_LENGTH = 40;
 
+/** Longest we wait for any single ImageKit call before answering the client. */
+const IMAGEKIT_TIMEOUT_MS = 30_000;
+
+class ImageKitTimeoutError extends Error {
+  constructor() {
+    super(`ImageKit did not respond within ${IMAGEKIT_TIMEOUT_MS / 1000}s`);
+    this.name = "ImageKitTimeoutError";
+  }
+}
+
+/**
+ * Runs one ImageKit SDK call with a timeout. The SDK (axios) has no timeout option,
+ * so a stalled call would otherwise hang the request. A timed-out upload may still
+ * finish on ImageKit's side; it keeps the "pending" tag, so the cleanup script removes it.
+ */
+const runImageKit = <T>(call: () => Promise<T>): Promise<T> => {
+  let timer: NodeJS.Timeout;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new ImageKitTimeoutError()), IMAGEKIT_TIMEOUT_MS);
+  });
+  return Promise.race([call(), timeout]).finally(() => clearTimeout(timer));
+};
+
+/**
+ * The SDK hides the HTTP status in a non-enumerable `$ResponseMetadata`, so `error.status`
+ * is always undefined. Read it from there.
+ */
+const getUpstreamStatus = (error: any): number | undefined =>
+  error?.$ResponseMetadata?.statusCode ?? error?.status ?? error?.response?.status;
+
+const isNotFound = (error: any): boolean =>
+  getUpstreamStatus(error) === 404 || /not found/i.test(String(error?.message ?? ""));
+
+/** Logs everything useful about an ImageKit failure (no headers, no keys). */
+const logImageKitError = (error: any, operation: string): void => {
+  logger.error(
+    {
+      operation,
+      upstreamStatus: getUpstreamStatus(error),
+      timedOut: error instanceof ImageKitTimeoutError,
+      errorCode: error?.code,
+      errorMessage: error?.message,
+      help: error?.help,
+    },
+    `ImageKit ${operation} failed`
+  );
+};
+
+/** Logs the failure and builds the API error returned to the client. */
+const toImageKitError = (error: any, operation: string, code: string, clientMessage: string): AppError => {
+  logImageKitError(error, operation);
+  const timedOut = error instanceof ImageKitTimeoutError;
+  const upstreamStatus = getUpstreamStatus(error);
+
+  if (timedOut) {
+    return new AppError("IMAGEKIT_TIMEOUT", "The image service took too long to respond. Please try again.", 504);
+  }
+  if (upstreamStatus === 429) {
+    return new AppError("IMAGEKIT_RATE_LIMITED", "Too many image requests. Please try again shortly.", 429);
+  }
+  return new AppError(code, clientMessage, 502);
+};
+
 export const isValidFileId = (value: unknown): value is string =>
   typeof value === "string" && FILE_ID_REGEX.test(value.trim());
 
@@ -175,14 +238,14 @@ export const uploadImage = async (
   const imagekit = getImageKit();
 
   try {
-    const response = await imagekit.upload({
+    const response = await runImageKit(() => imagekit.upload({
       file,
       fileName: safeFileName,
       folder: sanitizedFolder,
       tags: [...sanitizeTags(tags), PENDING_TAG],
       isPrivateFile,
       useUniqueFileName: false, // We already guarantee unique safe names
-    });
+    }));
 
     return {
       fileId: response.fileId,
@@ -196,9 +259,7 @@ export const uploadImage = async (
       width: response.width,
     };
   } catch (error: any) {
-    logger.error({ err: error }, "ImageKit upload failed");
-    const message = error?.message || "Failed to upload image to ImageKit.";
-    throw new AppError("IMAGEKIT_UPLOAD_ERROR", message, error?.status || 502);
+    throw toImageKitError(error, "upload", "IMAGEKIT_UPLOAD_ERROR", "Failed to upload image. Please try again.");
   }
 };
 
@@ -219,11 +280,10 @@ export const deleteImage = async (fileId: string): Promise<{ success: boolean; f
   await getManagedFileDetails(cleanFileId);
 
   try {
-    await imagekit.deleteFile(cleanFileId);
+    await runImageKit(() => imagekit.deleteFile(cleanFileId));
     return { success: true, fileId: cleanFileId };
   } catch (error: any) {
-    // Check if error represents a 404 (file already gone or does not exist)
-    if (error?.status === 404 || error?.message?.toLowerCase().includes("not found")) {
+    if (isNotFound(error)) {
       throw new AppError(
         "FILE_NOT_FOUND",
         `Image with ID '${cleanFileId}' not found or already deleted.`,
@@ -231,9 +291,7 @@ export const deleteImage = async (fileId: string): Promise<{ success: boolean; f
       );
     }
 
-    logger.error({ err: error }, "ImageKit delete failed");
-    const message = error?.message || "Failed to delete image from ImageKit.";
-    throw new AppError("IMAGEKIT_DELETE_ERROR", message, error?.status || 502);
+    throw toImageKitError(error, "delete", "IMAGEKIT_DELETE_ERROR", "Failed to delete image. Please try again.");
   }
 };
 
@@ -251,18 +309,13 @@ export const getImageDetails = async (fileId: string) => {
   const imagekit = getImageKit();
 
   try {
-    const details = await imagekit.getFileDetails(cleanFileId);
+    const details = await runImageKit(() => imagekit.getFileDetails(cleanFileId));
     return details;
   } catch (error: any) {
-    if (error?.status === 404 || error?.message?.toLowerCase().includes("not found")) {
+    if (isNotFound(error)) {
       throw new AppError("FILE_NOT_FOUND", `File with ID '${cleanFileId}' was not found.`, 404);
     }
-    logger.error({ err: error }, "ImageKit get details failed");
-    throw new AppError(
-      "IMAGEKIT_DETAILS_ERROR",
-      error?.message || "Failed to retrieve file details.",
-      error?.status || 502
-    );
+    throw toImageKitError(error, "get details", "IMAGEKIT_DETAILS_ERROR", "Failed to retrieve image details. Please try again.");
   }
 };
 
@@ -318,10 +371,10 @@ export const markFileAttached = async (fileId: string, tags?: string[] | null): 
   try {
     const next = (tags ?? []).filter((t) => t !== PENDING_TAG);
     if (next.length === (tags ?? []).length) return; // nothing to change
-    await getImageKit().updateFileDetails(fileId, { tags: next });
+    await runImageKit(() => getImageKit().updateFileDetails(fileId, { tags: next }));
   } catch (error) {
     // Not fatal: the record is saved; the file just stays tagged and the cleanup script re-checks it.
-    logger.error({ err: error }, "ImageKit markFileAttached failed");
+    logImageKitError(error, "mark attached");
   }
 };
 
@@ -333,10 +386,10 @@ export const safeDeleteFile = async (fileId: string | null | undefined): Promise
   if (!fileId || !isValidFileId(fileId)) return;
   try {
     ensureImageKitConfigured();
-    await getImageKit().deleteFile(fileId.trim());
+    await runImageKit(() => getImageKit().deleteFile(fileId.trim()));
   } catch (error: any) {
-    if (error?.status === 404 || error?.message?.toLowerCase().includes("not found")) return;
-    logger.error({ err: error }, "ImageKit safeDeleteFile failed");
+    if (isNotFound(error)) return;
+    logImageKitError(error, "safe delete");
   }
 };
 
@@ -348,7 +401,9 @@ export const listStalePendingUploads = async (olderThanMs: number) => {
   const stale: Array<{ fileId: string; filePath: string; createdAt: string }> = [];
 
   for (let skip = 0; ; skip += 100) {
-    const page = await imagekit.listFiles({ tags: PENDING_TAG, fileType: "image", limit: 100, skip });
+    const page = await runImageKit(() =>
+      imagekit.listFiles({ tags: PENDING_TAG, fileType: "image", limit: 100, skip })
+    );
     for (const file of page as any[]) {
       if (isManagedPath(file.filePath) && new Date(file.createdAt).getTime() < cutoff) {
         stale.push({ fileId: file.fileId, filePath: file.filePath, createdAt: file.createdAt });

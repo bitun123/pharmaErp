@@ -167,3 +167,4 @@ export const listShopsQuerySchema = z.object({
     .default("createdAt"),
   sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });
+ 
